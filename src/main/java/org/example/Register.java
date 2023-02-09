@@ -15,41 +15,65 @@ public class Register {
         Statement stmt = null;
         if (conn == null) {
             System.out.print("megafuck");
-        }
-        else{
+        } else {
             System.out.print("ultrafuck");
 
         }
-         String role = "", name = "", department = "", year = "";
-         Scanner input = new Scanner(System.in);
-         System.out.println("Enter your role");
-         role = input.nextLine();
-         System.out.println("Enter your name");
-         name = input.nextLine();
 
-         System.out.println("Enter your department");
-         department = input.nextLine();
+        String role = "";
+        Scanner input = new Scanner(System.in);
+        System.out.println("Enter your role");
+        System.out.println("1. student \n 2. instructor \n 3. admin ");
 
-         System.out.println("Enter your year");
-         year = input.nextLine();
-         System.out.println(role + " " + name + " " + department + " " + year);
-        try {
-            stmt = conn.createStatement();
-            String query="INSERT INTO student(name,id,password) VALUES('"+name+"',"+ "'2020csb1111'"+","+"'ashish'" +")";
-            try {
+        role = input.nextLine();
+        switch (role) {
+            case "1":
+                String name = "", batch = "", department = "", entry_no = "", password = "";
+                System.out.println("Enter your name");
+                name = input.nextLine();
+                System.out.println("Enter your batch");
+                batch = input.nextLine();
+                System.out.println("Enter your department");
+                department = input.nextLine();
+                System.out.println("Enter your password");
+                password = input.nextLine();
+                String count="";
+               String  cquery="select count(*) from student";
+                ResultSet rs;
+                ResultSetMetaData rsmd;
+                try {
+                    stmt= conn.createStatement();
+                    rs=stmt.executeQuery(cquery);
+                    rsmd=rs.getMetaData();
+                    String s1 = "";
+                    while (rs.next()) {
+                        for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 
-                stmt.executeQuery(query);
 
+                            String columnValue = rs.getString(i);
+                            // System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                            s1 += columnValue;
+                        }
 
-            } catch (Exception e) {
+                    }
+                    System.out.println(s1);
+                    entry_no=s1;
+                    System.out.println(name +" "+ entry_no);
 
-                // TODO: handle exception
-            }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            String query = "INSERT INTO student(name,id,batch,department,password) VALUES('" + name + "'," + "'"+entry_no+"'," + "'"+batch+"',"+"'"+department+"',"+ "'" + password  + "');";
+System.out.println(query);
+                try {
+                    stmt.executeQuery(query);
+                } catch (SQLException e) {
 
+                }
+                break;
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
+
     }
 }
 
