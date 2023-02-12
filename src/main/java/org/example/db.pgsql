@@ -64,26 +64,27 @@ FOREIGN KEY (course_id) references course (id)
 
 CREATE TABLE student(
 id VARCHAR(10),
-name VARCHAR(10),
+name VARCHAR(100),
 batch_id VARCHAR(10),
-email VARCHAR(10),
-password VARCHAR(10),
+email VARCHAR(100),
+password VARCHAR(100),
+phone_number VARCHAR(20),
 credits INTEGER,
-token STRING,
+token TEXT,
 PRIMARY KEY (id),
-FOREIGN KEY (batch_id) references batch (id),
+FOREIGN KEY (batch_id) references batch (id)
 );
 
 CREATE TABLE instructor(
 id VARCHAR(10),
 name VARCHAR(10),
-email VARCHAR(10),
+email VARCHAR(100),
 dep_id VARCHAR(10),
-password VARCHAR(10),
+password VARCHAR(100),
+phone_number VARCHAR(20),
 token TEXT,
 PRIMARY KEY (id),
 FOREIGN KEY (dep_id) references department (id)
-
 );
 
 
@@ -101,11 +102,16 @@ CREATE TABLE GRADES(
 student_id VARCHAR(10),
 course_id VARCHAR(10),
 grade VARCHAR(5),
-semester VARCHAR(10),
+semester VARCHAR(100),
+academic_year VARCHAR(100),
 FOREIGN KEY (student_id) references student (id),
-FOREIGN KEY (course_id) references course (id),
-)
+FOREIGN KEY (course_id) references course (id)
+);
 
+CREATE TABLE semester(
+academic_year VARCHAR(10);
+semester VARCHAR(10);
+)
 
 
 

@@ -1,5 +1,6 @@
 package org.example;
 
+import javax.swing.*;
 import java.util.Scanner;
 
 import java.sql.*;
@@ -129,5 +130,273 @@ public class admin {
 
 
         }
+    }
+
+    public static void showGrades(){
+        try {
+            stmt=conn.createStatement();
+            String query = "select * from grades;";
+            System.out.println(query);
+            try {
+                ResultSet rs;
+                ResultSetMetaData rsmd;
+               rs= stmt.executeQuery(query);
+               rsmd=rs.getMetaData();
+               int columnsNumber = rsmd.getColumnCount();
+               String responseQuery="";
+                while (rs.next()) {
+                    for (int i = 1; i <= columnsNumber; i++) {
+
+                        if (i == 1)
+                            responseQuery += "student_id ---> ";
+                        if (i == 2)
+                            responseQuery += "      course_id ---> ";
+                        if (i == 3)
+                            responseQuery += "      Grade ---> ";
+                        if (i == 4)
+                            responseQuery += "      semester ---> ";
+                        if (i == 5)
+                            responseQuery += "      academic year ---> ";
+
+                        if (i > 1)
+                            responseQuery = responseQuery + " ";
+                        String columnValue = rs.getString(i);
+                        // System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                        responseQuery += columnValue;
+                    }
+                    responseQuery = responseQuery + "\n";
+
+                }
+                System.out.println(responseQuery);
+                System.out.println("press any key to continue");
+                input.nextLine();
+            } catch (SQLException e) {
+                System.out.println(e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void adduser(){
+        while(true){
+            System.out.println("press \n0 to exit\n1 to add student\n2 to add instructor");
+            String role=input.nextLine();
+            switch (role){
+                case "0": {return;}
+                case "1":
+                {String id,name,batch_id,phone_number;
+              System.out.println("enter name of the student");
+              name=input.nextLine();
+                    System.out.println("enter batch_id of the student");
+                    batch_id=input.nextLine();
+                    System.out.println("enter phone number of the student");
+                    phone_number=input.nextLine();
+                    try {
+                        stmt=conn.createStatement();
+                    try {
+                        ResultSet rs;
+                        ResultSetMetaData rsmd;
+                        String query="select count(*) from student where batch_id='"+batch_id+"';";
+                        rs= stmt.executeQuery(query);
+                        rsmd=rs.getMetaData();
+                        int columnsNumber = rsmd.getColumnCount();
+                        String responseQuery="";
+                        while (rs.next()) {
+                            for (int i = 1; i <= columnsNumber; i++) {
+
+
+                                String columnValue = rs.getString(i);
+                                // System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                                responseQuery += columnValue;
+                            }
+
+                        }
+                      id=batch_id+responseQuery;
+                        query="insert into student(id,name,batch_id,email,password,phone_number,credits,token) values('"+id+"','"+name+"','"+batch_id+"','"+id+"@iitrpr.ac.in','"+ "yet to be set','"+phone_number+"',0,'');";
+                        System.out.println(query);
+                         stmt.executeUpdate(query);
+
+                    } catch (SQLException e) {
+                        System.out.println(e);
+                    }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+                    break;}
+                case "2": {
+                    String id, name,dep_id, phone_number;
+                    System.out.println("enter name of the instructor");
+                    name = input.nextLine();
+                    System.out.println("enter dep_id of the instructor");
+                    dep_id = input.nextLine();
+                    System.out.println("enter phone number of the instructor");
+                    phone_number = input.nextLine();
+                    try {
+                        stmt = conn.createStatement();
+                        try {
+                            ResultSet rs;
+                            ResultSetMetaData rsmd;
+                            String query = "select count(*) from instructor where dep_id='"+dep_id+"';";
+                            rs = stmt.executeQuery(query);
+                            rsmd = rs.getMetaData();
+                            int columnsNumber = rsmd.getColumnCount();
+                            String responseQuery = "";
+                            while (rs.next()) {
+                                for (int i = 1; i <= columnsNumber; i++) {
+
+
+                                    String columnValue = rs.getString(i);
+                                    // System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                                    responseQuery += columnValue;
+                                }
+
+                            }
+                            id = dep_id + responseQuery;
+                            query = "insert into instructor(id,name,dep_id,email,password,phone_number,token) values('" + id + "','" + name + "','" + dep_id + "','" + id + "@iitrpr.ac.in','" + "yet to be set','" + phone_number + "','');";
+                            System.out.println(query);
+                            stmt.executeUpdate(query);
+                        } catch (SQLException e) {
+                            System.out.println(e);
+                        }
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                }
+                default:System.out.println("please follow the instructions");
+
+            }
+        }
+    }
+
+    public static void startsem(){
+        try {
+            ResultSet rs;
+            stmt=conn.createStatement();
+
+            rs=stmt.executeQuery("select *from semester;");
+            System.out.println("A sem is already running");
+            System.out.println("press any key to continue");
+            input.nextLine();
+            return;
+        } catch (SQLException e) {
+
+        }
+        String s1="drop table course_catalog";
+        String s2="drop table course_offering";
+        String s3="CREATE TABLE course_catalog(\n" +
+                "course_id VARCHAR(10),\n" +
+                "PRIMARY KEY(course_id),\n" +
+                "FOREIGN KEY (course_id) references course (id)\n" +
+                ");";
+        String s4="CREATE TABLE course_offering(\n" +
+                "course_id VARCHAR(10),\n" +
+                "cgpa_limit INTEGER,\n" +
+                "instructor_id VARCHAR(10),\n" +
+                "PRIMARY KEY(course_id),\n" +
+                "FOREIGN KEY (course_id) references course_catalog (course_id),\n" +
+                "FOREIGN KEY (instructor_id) references instructor (id)\n" +
+                "\n" +
+                ");";
+        String s5="CREATE TABLE semester(\n" +
+                "academic_year VARCHAR(10),\n" +
+                "semester VARCHAR(10)\n" +
+                ");";
+
+        String academic_year,semester;
+        System.out.println("enter the academic year");
+        academic_year=input.nextLine();
+        System.out.println("enter the semester monsoon/winter");
+        semester=input.nextLine();
+
+        try {
+            stmt=conn.createStatement();
+            try {
+                stmt.execute(s2);
+                stmt.execute(s1);
+                stmt.execute(s3);
+                stmt.execute(s4);
+                stmt.execute(s5);
+String query="insert into semester(academic_year,semester) values('"+academic_year+"','"+semester+"');";
+               stmt.executeUpdate(query);
+            } catch (SQLException e) {
+                System.out.println(e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        System.out.println( academic_year+"-"+semester+" started successfully");
+        System.out.println("please add course to the current sem's course catalog");
+        System.out.println("press any key to continue");
+        input.nextLine();
+    }
+
+    public static void endsem(){
+        String academic_year="",sem="";
+        try {
+            ResultSet rs;
+            stmt=conn.createStatement();
+
+            rs=stmt.executeQuery("select *from semester;");
+            while(rs.next()){
+                academic_year=rs.getString(1);
+                sem=rs.getString(2);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("No sem is running");
+            System.out.println("press any key to continue");
+            input.nextLine();
+            return;
+        }
+        try {
+            stmt.execute("drop table semester;");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println( academic_year+"-"+sem+" ended successfully");
+        System.out.println("press any key to continue");
+        input.nextLine();
+    }
+
+    public static void updatecoursecatalog(){
+        try {
+            ResultSet rs;
+            stmt=conn.createStatement();
+
+            rs=stmt.executeQuery("select *from semester");
+
+
+        } catch (SQLException e) {
+            System.out.println("sem is not yet started");
+            System.out.println("press any key to continue");
+            input.nextLine();
+            return;
+        }
+        while (true){
+            String course_id;
+            System.out.println("enter course code or enter 0 to exit");
+            course_id=input.nextLine();
+            if(course_id.equals("0")){
+                return;
+            }
+            try {
+                stmt=conn.createStatement();
+                String query = "INSERT INTO course_catalog(course_id) VALUES('" + course_id + "');" ;
+                System.out.println(query);
+                try {
+                    stmt.executeUpdate(query);
+                } catch (SQLException e) {
+                    System.out.println(e);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+
     }
 }

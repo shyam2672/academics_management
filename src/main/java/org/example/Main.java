@@ -23,7 +23,7 @@ public class Main {
              x.login();
              int flag=1;
              while(flag==1){
-                 System.out.println("Press \n0. to logout \n1. to add a new batch\n2. to add a new course\n3. to add or update a curriculum\n4. to start sem\n5. to end sem\n6. to add course to course_catalog\n7. to view grades of all students ");
+                 System.out.println("Press \n0. to logout \n1. to add a new batch\n2. to add a new course\n3. to add or update a curriculum\n4. to start sem\n5. to end sem\n6. to add course to course_catalog\n7. to view grades of all students\n8. to add users ");
                  String r="";
 
                  r=input.nextLine();
@@ -37,11 +37,17 @@ public class Main {
                      break;
                      case "3": x.addcurriculum();
                      break;
-                     case "4": semester.startsem();
+                     case "4": x.startsem();
                      break;
-                     case "5": semester.endsem();
+                     case "5": x.endsem();
                      break;
-                     case "6": semester.updatecoursecatalog();
+                     case "6": x.updatecoursecatalog();
+                     break;
+                     case "7":x.showGrades();
+                     break;
+                     case "8":x.adduser();
+                     break;
+                     default:System.out.println("please follow the instructions");
                      break;
                  }
              }
