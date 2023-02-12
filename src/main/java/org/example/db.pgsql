@@ -1,0 +1,114 @@
+CREATE TABLE department(
+id VARCHAR(10),
+name VARCHAR(50),
+PRIMARY KEY (id)
+);
+
+INSERT INTO department(id,name) VALUES ('CS','Computer Science');
+INSERT INTO department(id,name) VALUES ('EE','Electrical Engineering');
+INSERT INTO department(id,name) VALUES ('MNC','Maths and Computing');
+INSERT INTO department(id,name) VALUES ('ME','Mechanical Engineering');
+
+
+CREATE TABLE batch(
+id VARCHAR(10),
+year VARCHAR(10),
+dep_id VARCHAR(10),
+PRIMARY KEY(id),
+FOREIGN KEY (dep_id) references department (id)
+);
+
+CREATE TABLE course(
+id VARCHAR(10),
+name VARCHAR(100),
+dep_id VARCHAR(10),
+l integer,
+t integer,
+p integer,
+c integer,
+PRIMARY KEY(id),
+FOREIGN KEY (dep_id) references department (id)
+
+);
+
+CREATE TABLE ug_curriculum(
+course_id VARCHAR(10),
+batch_id VARCHAR(10),
+course_type VARCHAR(100),
+FOREIGN KEY (course_id) references course (id)
+);
+
+CREATE TABLE course_catalog(
+course_id VARCHAR(10),
+PRIMARY KEY(course_id),
+FOREIGN KEY (course_id) references course (id)
+);
+
+CREATE TABLE course_offering(
+course_id VARCHAR(10),
+cgpa_limit INTEGER,
+instructor_id VARCHAR(10),
+PRIMARY KEY(course_id),
+FOREIGN KEY (course_id) references course_catalog (course_id),
+FOREIGN KEY (instructor_id) references instructor (id)
+
+);
+
+CREATE TABLE prereq(
+course_id VARCHAR(10),
+prereq_id VARCHAR(10),
+FOREIGN KEY (course_id) references course (id),
+FOREIGN KEY (course_id) references course (id)
+);
+
+
+CREATE TABLE student(
+id VARCHAR(10),
+name VARCHAR(10),
+batch_id VARCHAR(10),
+email VARCHAR(10),
+password VARCHAR(10),
+credits INTEGER,
+token STRING,
+PRIMARY KEY (id),
+FOREIGN KEY (batch_id) references batch (id),
+);
+
+CREATE TABLE instructor(
+id VARCHAR(10),
+name VARCHAR(10),
+email VARCHAR(10),
+dep_id VARCHAR(10),
+password VARCHAR(10),
+token TEXT,
+PRIMARY KEY (id),
+FOREIGN KEY (dep_id) references department (id)
+
+);
+
+
+CREATE TABLE registration_status(
+course_id VARCHAR(10),
+student_id VARCHAR(10),
+instructor_id VARCHAR(10),
+status VARCHAR(10),
+FOREIGN KEY (course_id) references course (id),
+FOREIGN KEY (student_id) references student (id),
+FOREIGN KEY (instructor_id) references instructor (id)
+);
+
+CREATE TABLE GRADES(
+student_id VARCHAR(10),
+course_id VARCHAR(10),
+grade VARCHAR(5),
+semester VARCHAR(10),
+FOREIGN KEY (student_id) references student (id),
+FOREIGN KEY (course_id) references course (id),
+)
+
+
+
+
+
+
+
