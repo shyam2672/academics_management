@@ -185,7 +185,7 @@ public class admin {
             switch (role){
                 case "0": {return;}
                 case "1":
-                {String id,name,batch_id,phone_number;
+                {String id,name,batch_id,phone_number,password;
               System.out.println("enter name of the student");
               name=input.nextLine();
                     System.out.println("enter batch_id of the student");
@@ -213,7 +213,7 @@ public class admin {
 
                         }
                       id=batch_id+responseQuery;
-                        query="insert into student(id,name,batch_id,email,password,phone_number,credits,token) values('"+id+"','"+name+"','"+batch_id+"','"+id+"@iitrpr.ac.in','"+ "yet to be set','"+phone_number+"',0,'');";
+                        query="insert into student(id,name,batch_id,email,password,phone_number,credits,token) values('"+id+"','"+name+"','"+batch_id+"','"+id+"@iitrpr.ac.in','"+ "iitropar','"+phone_number+"',0,'');";
                         System.out.println(query);
                          stmt.executeUpdate(query);
 
@@ -253,7 +253,7 @@ public class admin {
 
                             }
                             id = dep_id + responseQuery;
-                            query = "insert into instructor(id,name,dep_id,email,password,phone_number,token) values('" + id + "','" + name + "','" + dep_id + "','" + id + "@iitrpr.ac.in','" + "yet to be set','" + phone_number + "','');";
+                            query = "insert into instructor(id,name,dep_id,email,password,phone_number,token) values('" + id + "','" + name + "','" + dep_id + "','" + id + "@iitrpr.ac.in','" + "iitropar','" + phone_number + "','');";
                             System.out.println(query);
                             stmt.executeUpdate(query);
                         } catch (SQLException e) {
@@ -283,8 +283,7 @@ public class admin {
         } catch (SQLException e) {
 
         }
-        String s1="drop table course_catalog";
-        String s2="drop table course_offering";
+
         String s3="CREATE TABLE course_catalog(\n" +
                 "course_id VARCHAR(10),\n" +
                 "PRIMARY KEY(course_id),\n" +
@@ -303,6 +302,15 @@ public class admin {
                 "academic_year VARCHAR(10),\n" +
                 "semester VARCHAR(10)\n" +
                 ");";
+        String s7="CREATE TABLE registration_status(\n" +
+                "course_id VARCHAR(10),\n" +
+                "student_id VARCHAR(10),\n" +
+                "instructor_id VARCHAR(10),\n" +
+                "status VARCHAR(100),\n" +
+                "FOREIGN KEY (course_id) references course_offering (course_id),\n" +
+                "FOREIGN KEY (student_id) references student (id),\n" +
+                "FOREIGN KEY (instructor_id) references instructor (id)\n" +
+                ");";
 
         String academic_year,semester;
         System.out.println("enter the academic year");
@@ -313,11 +321,12 @@ public class admin {
         try {
             stmt=conn.createStatement();
             try {
-                stmt.execute(s2);
-                stmt.execute(s1);
+
                 stmt.execute(s3);
                 stmt.execute(s4);
                 stmt.execute(s5);
+                stmt.execute(s7);
+
 String query="insert into semester(academic_year,semester) values('"+academic_year+"','"+semester+"');";
                stmt.executeUpdate(query);
             } catch (SQLException e) {
@@ -354,6 +363,13 @@ String query="insert into semester(academic_year,semester) values('"+academic_ye
         }
         try {
             stmt.execute("drop table semester;");
+            String s1="drop table course_catalog;";
+            String s2="drop table course_offering;";
+            String s6="drop table registration_status;";
+            stmt.execute(s6);
+            stmt.execute(s2);
+            stmt.execute(s1);
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -397,6 +413,9 @@ String query="insert into semester(academic_year,semester) values('"+academic_ye
             }
         }
 
+
+    }
+    public static void submittransscript(){
 
     }
 }

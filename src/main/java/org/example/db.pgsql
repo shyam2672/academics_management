@@ -92,8 +92,8 @@ CREATE TABLE registration_status(
 course_id VARCHAR(10),
 student_id VARCHAR(10),
 instructor_id VARCHAR(10),
-status VARCHAR(10),
-FOREIGN KEY (course_id) references course (id),
+status VARCHAR(100),
+FOREIGN KEY (course_id) references course_offering (course_id),
 FOREIGN KEY (student_id) references student (id),
 FOREIGN KEY (instructor_id) references instructor (id)
 );
