@@ -165,16 +165,26 @@ if(course_id.equals("0")){
                 try {
                     ResultSet rs;
                     rs=stmt.executeQuery(query2);
-                    System.out.println("Course already offered by someone else");
+                    String f="";
+                    while(rs.next()) {
+                       f = rs.getString(1);
+                    }
+                    if(f.equals(""))
+                    {
+                        String cgpa_limit;
+                        System.out.println("set the cgpa limit for this course");
+                        cgpa_limit=input.nextLine();
+
+                        query="insert into course_offering(course_id,cgpa_limit,instructor_id) values ('"+course_id+"',"+cgpa_limit+",'"+user_id+"');";
+                        stmt.executeUpdate(query);
+                        System.out.println("Added course successfully");
+                    }
+                    else{
+                        System.out.println("Course already offered by someone else");
+                    }
                 }
                 catch (SQLException e){
-                    String cgpa_limit;
-                    System.out.println("set the cgpa limit for this course");
-                    cgpa_limit=input.nextLine();
-
-                    query="insert into course_offering(course_id,cgpa_limit,instructor_id) values ('"+course_id+"',"+cgpa_limit+",'"+user_id+"');";
-                    stmt.executeUpdate(query);
-                    System.out.println("Added course successfully");
+                    System.out.println(e);
                 }
 
             } catch (SQLException e) {
@@ -253,9 +263,7 @@ public static void mycourses(){
                     responseQuery += "instructor_id ---> ";
 
                 String columnValue = rs.getString(i);
-                responseQuery += columnValue;
-                if(i>1)responseQuery+=" ";
-
+                responseQuery += columnValue+" ";
                 // System.out.print(columnValue + " " + rsmd.getColumnName(i));
             }
             responseQuery+="\n";
@@ -280,6 +288,9 @@ public static void mycourses(){
             String course_id;
             System.out.println("enter course_id to delete or 0 to exit");
             course_id=input.nextLine();
+            if(course_id.equals("0")){
+                return;
+            }
             String query="delete from course_offering where course_id='"+course_id+"' and instructor_id='"+user_id+"';";
             try {
                 stmt=conn.createStatement();
@@ -356,7 +367,7 @@ public static void mycourses(){
             input.nextLine();
             return;
         }
-String query="select * from registration_status where isntructor_id='"+user_id+"',status='pending instructor approval';";
+String query="select * from registration_status where instructor_id='"+user_id+"' and status='pending instructor approval';";
 
         try {
             stmt= conn.createStatement();
@@ -381,6 +392,12 @@ String query="select * from registration_status where isntructor_id='"+user_id+"
                 }
                 responseQuery = responseQuery + "\n";
 
+            }
+            if(responseQuery.equals("")){
+                System.out.println("No enrolllments requests yet");
+                System.out.println("press any key to continue");
+                input.nextLine();
+                return;
             }
             System.out.println(responseQuery);
             System.out.println("press any key to continue");

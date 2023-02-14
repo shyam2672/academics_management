@@ -115,6 +115,8 @@ semester VARCHAR(10);
 
 
 
-
+select course_offering.course_id,ug_curriculum.course_type,course_offering.instructor_id
+from student,ug_curriculum,course_offering
+where student.batch_id=ug_curriculum.batch_id and ug_curriculum.course_id=course_offering.course_id;
 
 
