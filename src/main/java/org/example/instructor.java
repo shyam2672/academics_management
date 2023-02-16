@@ -1,7 +1,9 @@
 package org.example;
 
-import javax.swing.*;
 import java.util.Scanner;
+
+import java.io.*;
+import java.sql.*;
 
 import java.sql.*;
 import java.sql.Connection;
@@ -30,12 +32,24 @@ public class instructor {
                 ResultSet rs;
 
                 rs=stmt.executeQuery(query);
-                System.out.println("logged in successfully");
-                user=true;
+                int f=0;
                 while(rs.next()){
+                    f++;
                     user_id=rs.getString(1);
                 }
-                return;
+                if(f==0){
+                    System.out.println("wrong credentials");
+                    System.out.println("press any key to continue");
+                    input.nextLine();
+                    continue;
+                }
+                else{
+                    user=true;
+                    System.out.println("logged in successfully");
+                    return;
+
+                }
+
 
             } catch (SQLException e) {
                 System.out.println(e);
@@ -434,8 +448,83 @@ String query="select * from registration_status where instructor_id='"+user_id+"
     }
 
     public static void submitgrades(){
+        String csvFilePath="src/main/resources/grades.csv";
+        String sql = "INSERT INTO grades (student_id, course_id, grade, semester, academic_year) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement statement = null;
+        try {
+            statement = conn.prepareStatement(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        BufferedReader lineReader = null;
+        try {
+            lineReader = new BufferedReader(new FileReader(csvFilePath));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        String lineText = null;
+
+        int count = 0;
+
+        try {
+            lineReader.readLine(); // skip header line
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        while (true) {
+            try {
+                if (!((lineText = lineReader.readLine()) != null)) break;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            String[] data = lineText.split(",");
+            if(data.length!=5){
+                 System.out.println("Some lines were buggy");
+                 continue;
+            }
+            String student_id = data[0];
+            String course_id = data[1];
+            String grade = data[2];
+            String semester = data[3];
+            String academic_year = data[4] ;
+
+            try{
+                statement.setString(1, student_id);
+                statement.setString(2, course_id);
+
+                statement.setString(3, grade);
+
+                statement.setString(4, semester);
+
+                statement.setString(5, academic_year);
+            }
+            catch (Exception e){
+                System.out.println(e);
+            }
+
+            try {
+                statement.execute();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+
+        }
+
+        try {
+            lineReader.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+System.out.println("grades submitted successfully");
+        System.out.println("press any key to continue");
+        input.nextLine();
+        // execute the remaining queries
 
     }
+
 
 
 

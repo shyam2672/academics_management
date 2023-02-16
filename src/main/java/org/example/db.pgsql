@@ -109,9 +109,15 @@ FOREIGN KEY (course_id) references course (id)
 );
 
 CREATE TABLE semester(
-academic_year VARCHAR(10);
-semester VARCHAR(10);
-)
+academic_year VARCHAR(10),
+semester VARCHAR(10)
+);
+
+CREATE TABLE transcript(
+student_id VARCHAR(10),
+transcript bytea,
+FOREIGN KEY (student_id) references student (id)
+);
 
 
 

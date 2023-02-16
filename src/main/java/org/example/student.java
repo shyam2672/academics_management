@@ -30,7 +30,6 @@ public class student {
                 ResultSet rs;
 
                 rs=stmt.executeQuery(query);
-                user=true;
                 int f=0;
                 while(rs.next()){
                    f++;
@@ -44,6 +43,8 @@ public class student {
                     input.nextLine();
                 }
                 else{
+                    user=true;
+
                     System.out.println("logged in successfully");
                     return;
 

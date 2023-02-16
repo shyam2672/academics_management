@@ -98,7 +98,7 @@ public class Main {
                     x.login();
                     int flag=1;
                     while(flag==1){
-                        System.out.println("Press \n0. to logout \n1. to add a new batch\n2. to add a new course\n3. to add or update a curriculum\n4. to start sem\n5. to end sem\n6. to add course to course_catalog\n7. to view grades of all students\n8. to add users\n9. to generate student transcripts ");
+                        System.out.println("Press \n0. to logout \n1. to add a new batch\n2. to add a new course\n3. to add or update a curriculum\n4. to start sem\n5. to end sem\n6. to add course to course_catalog\n7. to view grades of all students\n8. to add users\n9. to generate student transcripts \n10. to view transcript");
                         String r="";
 
                         r=input.nextLine();
@@ -124,6 +124,8 @@ public class Main {
                                 break;
                             case "9":x.submittransscript();
                                 break;
+                            case "10":admin.viewtranscript();
+                            break;
                             default:System.out.println("please follow the instructions");
                                 break;
                         }

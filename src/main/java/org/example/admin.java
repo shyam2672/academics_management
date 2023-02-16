@@ -1,5 +1,6 @@
 package org.example;
-
+import java.io.*;
+import java.sql.*;
 import javax.swing.*;
 import java.util.Scanner;
 
@@ -425,6 +426,95 @@ String query="insert into semester(academic_year,semester) values('"+academic_ye
 
     }
     public static void submittransscript(){
+        String student_id;
+        System.out.println("enter the student_id");
+        student_id=input.nextLine();
+        File file = new File("src/main/resources/transcript.txt");
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement("INSERT INTO transcript VALUES (?, ?)");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
+        try {
+            ps.setString(1, student_id);
+            ps.setBinaryStream(2, fis, file.length());
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            fis.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    public static void viewtranscript(){
+        String student_id="";
+        String transcript="";
+        System.out.println("enter student id");
+        student_id=input.nextLine();
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement("SELECT transcript FROM transcript WHERE student_id = ?");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            ps.setString(1, student_id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        ResultSet rs = null;
+        try {
+            rs = ps.executeQuery();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        if (rs != null) {
+            while (true) {
+                try {
+                    if (!rs.next()) break;
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    byte[] imgBytes = rs.getBytes(1);
+                    transcript=new String(imgBytes);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                // use the data in some way here
+            }
+            try {
+                rs.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else{
+            System.out.println("no transcript for this student");
+        }
+        try {
+            ps.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+System.out.println(transcript);
+        System.out.println("press any key to continue");
+        input.nextLine();
     }
 }
