@@ -20,6 +20,43 @@ public class Main {
             switch (c){
 
                 case "1":
+                    student.login();
+                    while(student.user){
+                        System.out.println("Press \n0. to logout \n1. to view profile\n2. to update profile\n3. to view the offered courses\n4. to add course\n5. to delete Course\n6. to view your courses\n7. to view grades\n8. to view your cgpa\n9. to check graduation  ");
+                        String r="";
+
+                        r=input.nextLine();
+                        switch (r){
+                            case "0":
+                                student.user=false;
+                                break;
+                            case "1":student.viewprofile();
+                                break;
+                            case "2": student.updateprofile();
+                                break;
+                            case "3": student.offeredCourses();
+                                break;
+                            case "4": student.addCourse();
+                                break;
+                            case "5": student.deleteCourse();
+                                break;
+                            case "6": student.mycourses();
+                                break;
+                            case "7":student.showGrades();
+                                break;
+                            case "8":double f=student.getcgpa();
+                            System.out.println(f);
+                                System.out.println("press any key to continue");
+                                input.nextLine();
+                                break;
+                            case "9":student.gradcheck();
+                                break;
+
+                            default:System.out.println("please follow the instructions");
+                                break;
+                        }
+                    }
+
                     break;
                 case "2":
                     instructor.login();

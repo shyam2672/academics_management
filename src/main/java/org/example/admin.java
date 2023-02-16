@@ -87,8 +87,17 @@ public class admin {
                 stmt=conn.createStatement();
                 String query = "INSERT INTO course(id,name,dep_id,l,t,p,c) VALUES('" + course_id + "'," + "'"+course_name+"'," + "'"+dep_id+ "',"+l+","+t+","+p+","+c+");";
                 System.out.println(query);
+
                 try {
                     stmt.executeUpdate(query);
+                    while (true){
+                        String pre;
+                        System.out.println("enter the course code of the prerequisite course of the course "+course_id+" or 0 to exit");
+                        pre=input.nextLine();
+                        if(pre.equals("0"))break;
+                        query="insert into prereq(course_id,prereq_id) values('"+course_id+"','"+pre+"');";
+                        stmt.executeUpdate(query);
+                    }
                 } catch (SQLException e) {
                     System.out.println(e);
                 }

@@ -120,3 +120,11 @@ from student,ug_curriculum,course_offering
 where student.batch_id=ug_curriculum.batch_id and ug_curriculum.course_id=course_offering.course_id;
 
 
+select ug_curriculum.course_id
+from ug_curriculum
+where course_type='core'
+except
+select grades.course_id
+from grades
+where grades.grade!='F' and grades.student_id=user_id;
+

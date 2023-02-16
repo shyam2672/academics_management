@@ -375,7 +375,9 @@ String query="select * from registration_status where instructor_id='"+user_id+"
             ResultSetMetaData rsmd=rs.getMetaData();
             int columnsNumber = rsmd.getColumnCount();
             String responseQuery="";
+            int f=0;
             while (rs.next()) {
+                f++;
                 for (int i = 1; i <= columnsNumber; i++) {
 
                     if (i == 1)
@@ -393,7 +395,7 @@ String query="select * from registration_status where instructor_id='"+user_id+"
                 responseQuery = responseQuery + "\n";
 
             }
-            if(responseQuery.equals("")){
+            if(f==0){
                 System.out.println("No enrolllments requests yet");
                 System.out.println("press any key to continue");
                 input.nextLine();
@@ -403,7 +405,7 @@ String query="select * from registration_status where instructor_id='"+user_id+"
             System.out.println("press any key to continue");
             input.nextLine();
 
-            System.out.println("Approve or disapprove");
+            System.out.println("Approve or disapprove requests ");
             while(true){
                 String course_id,student_id;
                 System.out.println("enter course_id or 0 to exit");
@@ -411,17 +413,17 @@ String query="select * from registration_status where instructor_id='"+user_id+"
                 if(course_id.equals("0")){
                     return;
                 }
-                System.out.println("enter Student_is ");
+                System.out.println("enter Student_id ");
                 student_id=input.nextLine();
                 String resp;
                 System.out.println("press 1 to approve and 2 to disapprove");
                 resp=input.nextLine();
                 if(resp.equals("1")){
-                     query="update registration_status set status='approved by the instructor' where course_id='"+course_id+" and student_id='"+student_id+"';";
+                     query="update registration_status set status='approved by the instructor' where course_id='"+course_id+"' and student_id='"+student_id+"';";
                     stmt.executeUpdate(query);
                 }
                 else{
-                    query="update registration_status set status='rejected by the instructor' where course_id='"+course_id+" and student_id='"+student_id+"';";
+                    query="update registration_status set status='rejected by the instructor' where course_id='"+course_id+"' and student_id='"+student_id+"';";
                     stmt.executeUpdate(query);
                 }
             }
