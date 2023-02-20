@@ -12,6 +12,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
+import java.io.*;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 public class admin {
     static Connection conn = Connect.ConnectDB();
     static Statement stmt = null;
@@ -25,9 +28,35 @@ public class admin {
             username=input.nextLine();
             System.out.println("enter password");
             password=input.nextLine();
-            System.out.println(username + " "+ password);
+//            System.out.println(username + " "+ password);
             if(username.equals("admin") && password.equals("iitropar")){
-                System.out.println("logged in successfully");
+                try {
+
+
+                    FileWriter fileWritter = new FileWriter("log.txt",true);
+                    BufferedWriter out = new BufferedWriter(fileWritter);
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                    LocalDateTime now = LocalDateTime.now();
+                    String time= dtf.format(now);
+
+
+
+                    String query="admin  logged in on "+ time +"\n";
+                    // Writing on output stream
+                    out.write(query);
+                    System.out.println("logged in successfully");
+
+                    // Closing the connection
+                    out.close();
+                }
+
+                // Catch block to handle the exceptions
+                catch (IOException e) {
+
+                    // Display message when exception occurs
+                    System.out.println("exception occurred" + e);
+                }
+
                 break;
             }
             else{
@@ -35,7 +64,35 @@ public class admin {
             }
         }
     }
+public static void logout(){
+    try {
 
+
+        FileWriter fileWritter = new FileWriter("log.txt",true);
+        BufferedWriter out = new BufferedWriter(fileWritter);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        String time= dtf.format(now);
+
+
+
+        String query="admin  logged out on "+ time +"\n";
+        // Writing on output stream
+        out.write(query);
+        System.out.println("logged in successfully");
+
+        // Closing the connection
+        out.close();
+    }
+
+    // Catch block to handle the exceptions
+    catch (IOException e) {
+
+        // Display message when exception occurs
+        System.out.println("exception occurred" + e);
+    }
+
+}
     public static void addbatch(){
         while(true){
             String batch_id="",year="",dep_id="";
@@ -128,7 +185,7 @@ public class admin {
             try {
                 stmt=conn.createStatement();
                 String query = "INSERT INTO ug_curriculum(course_id,batch_id,course_type) VALUES('" + course_id + "'," + "'"+batch_id+"'," + "'"+course_type+"');";
-                System.out.println(query);
+//                System.out.println(query);
                 try {
                     stmt.executeUpdate(query);
                 } catch (SQLException e) {
@@ -146,7 +203,6 @@ public class admin {
         try {
             stmt=conn.createStatement();
             String query = "select * from grades;";
-            System.out.println(query);
             try {
                 ResultSet rs;
                 ResultSetMetaData rsmd;
@@ -224,7 +280,6 @@ public class admin {
                         }
                       id=batch_id+responseQuery;
                         query="insert into student(id,name,batch_id,email,password,phone_number,credits,token) values('"+id+"','"+name+"','"+batch_id+"','"+id+"@iitrpr.ac.in','"+ "iitropar','"+phone_number+"',0,'');";
-                        System.out.println(query);
                          stmt.executeUpdate(query);
 
                     } catch (SQLException e) {
@@ -321,6 +376,7 @@ public class admin {
                 "FOREIGN KEY (student_id) references student (id),\n" +
                 "FOREIGN KEY (instructor_id) references instructor (id)\n" +
                 ");";
+        String s8="update student set credits=0";
 
         String academic_year,semester;
         System.out.println("enter the academic year");
@@ -427,8 +483,10 @@ String query="insert into semester(academic_year,semester) values('"+academic_ye
     }
     public static void submittransscript(){
         String student_id;
+        System.out.println("keep the transcript file ready");
         System.out.println("enter the student_id");
         student_id=input.nextLine();
+
         File file = new File("src/main/resources/transcript.txt");
         FileInputStream fis = null;
         try {
@@ -517,4 +575,135 @@ System.out.println(transcript);
         System.out.println("press any key to continue");
         input.nextLine();
     }
+
+    public static void viewcourses(){
+        String query="select * from course;";
+
+        try {
+            stmt=conn.createStatement();
+            ResultSet rs=stmt.executeQuery(query);
+            ResultSetMetaData rsmd;
+            rsmd=rs.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+            String responseQuery="";
+            while (rs.next()) {
+                for (int i = 1; i <= columnsNumber; i++) {
+
+                    if (i == 1)
+                        responseQuery += "course_id ---> ";
+                    if (i == 2)
+                        responseQuery += "name ---> ";
+                    if (i ==3)
+                        responseQuery += "dep_id ---> ";
+                    if (i ==4)
+                        responseQuery += "l ---> ";
+                    if (i == 5)
+                        responseQuery += "t ---> ";
+                    if (i == 6)
+                        responseQuery += "p---> ";
+                    if (i == 7)
+                        responseQuery += "c---> ";
+
+                    String columnValue = rs.getString(i);
+
+                    responseQuery += columnValue+" ";
+                    // System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                }
+                responseQuery+="\n";
+            }
+            System.out.println(responseQuery);
+            System.out.println("press any key to continue");
+            input.nextLine();
+        } catch (SQLException e) {
+            System.out.println("no courses to show");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void viewusers(){
+        String c="0";
+        System.out.println("enter 1 for student and 2 for instructor");
+        c=input.nextLine();
+        String query="select * from student;";
+        if(c.equals("1")){
+            try {
+                stmt= conn.createStatement();
+                ResultSet rs=stmt.executeQuery(query);
+                ResultSetMetaData rsmd;
+                rsmd=rs.getMetaData();
+                int columnsNumber = rsmd.getColumnCount();
+                String responseQuery="";
+                while (rs.next()) {
+                    for (int i = 1; i <= columnsNumber; i++) {
+
+                        if (i == 1)
+                            responseQuery += "student_id ---> ";
+                        if (i == 2)
+                            responseQuery += "name ---> ";
+                        if (i ==3)
+                            responseQuery += "batch_id ---> ";
+                        if (i ==4)
+                            responseQuery += "email ---> ";
+                        if (i == 5) continue;
+                        if (i == 6)
+                            responseQuery += "phone_number---> ";
+
+
+                        String columnValue = rs.getString(i);
+
+                        responseQuery += columnValue+"          ";
+                        // System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                    }
+                    responseQuery+="\n\n";
+                }
+                System.out.println(responseQuery);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+        else if(c.equals("2")){
+            try {
+                query="select * from instructor;";
+                stmt= conn.createStatement();
+                ResultSet rs=stmt.executeQuery(query);
+                ResultSetMetaData rsmd;
+                rsmd=rs.getMetaData();
+                int columnsNumber = rsmd.getColumnCount();
+                String responseQuery="";
+                while (rs.next()) {
+                    for (int i = 1; i <= columnsNumber; i++) {
+
+                        if (i == 1)
+                            responseQuery += "instructor_id ---> ";
+                        if (i == 2)
+                            responseQuery += "name ---> ";
+                        if (i ==3)
+                            responseQuery += "email ---> ";
+                        if (i ==4)
+                            responseQuery += "dep_id ---> ";
+                        if (i == 5) continue;
+                        if (i == 6)
+                            responseQuery += "phone_number---> ";
+
+
+                        String columnValue = rs.getString(i);
+
+                        responseQuery += columnValue+"      ";
+                        // System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                    }
+                    responseQuery+="\n\n";
+                }
+                System.out.println(responseQuery);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else{
+            System.out.println("you entered incorrect role");
+        }
+        System.out.println("press any key to continue");
+        input.nextLine();
+    }
+
 }

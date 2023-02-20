@@ -100,11 +100,13 @@ FOREIGN KEY (instructor_id) references instructor (id)
 
 CREATE TABLE GRADES(
 student_id VARCHAR(10),
+instructor_id VARCHAR(10),
 course_id VARCHAR(10),
 grade VARCHAR(5),
 semester VARCHAR(100),
 academic_year VARCHAR(100),
 FOREIGN KEY (student_id) references student (id),
+FOREIGN KEY (instructor_id) references instructor (id),
 FOREIGN KEY (course_id) references course (id)
 );
 

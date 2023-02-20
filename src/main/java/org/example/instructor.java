@@ -4,7 +4,9 @@ import java.util.Scanner;
 
 import java.io.*;
 import java.sql.*;
-
+import java.io.*;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,6 +19,8 @@ public class instructor {
     static Statement stmt = null;
     static Scanner input = new Scanner(System.in);
     public static String user_id="";
+    public static String token="'logged in'";
+
     public static boolean user=false;
     public static void login(){
         String email="",password="";
@@ -45,7 +49,31 @@ public class instructor {
                 }
                 else{
                     user=true;
+                    query="update instructor set token="+token+" where id='"+user_id+"';";
+                    stmt.executeUpdate(query);
                     System.out.println("logged in successfully");
+                    try {
+
+                        // Open given file in append mode by creating an
+                        // object of BufferedWriter class
+                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                        LocalDateTime now = LocalDateTime.now();
+                        String time= dtf.format(now);
+                        BufferedWriter out = new BufferedWriter(
+                                new FileWriter("log.txt", true));
+                        query="instructor "+user_id+" logged in on "+ time+"\n";
+                        // Writing on output stream
+                        out.write(query);
+                        // Closing the connection
+                        out.close();
+                    }
+
+                    // Catch block to handle the exceptions
+                    catch (IOException e) {
+
+                        // Display message when exception occurs
+                        System.out.println("exception occurred" + e);
+                    }
                     return;
 
                 }
@@ -58,6 +86,40 @@ public class instructor {
                 input.nextLine();
             }
 
+        }
+    }
+    public static void logout(){
+        user=false;
+        String query="update instructor set token='logged out' where id='"+user_id+"';";
+        try {
+
+            stmt= conn.createStatement();
+            stmt.executeUpdate(query);
+            try {
+
+                // Open given file in append mode by creating an
+                // object of BufferedWriter class
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                LocalDateTime now = LocalDateTime.now();
+                String time= dtf.format(now);
+                BufferedWriter out = new BufferedWriter(
+                        new FileWriter("log.txt", true));
+                query="instructor "+user_id+" logged out on "+ time +"\n";
+                // Writing on output stream
+                out.write(query);
+                // Closing the connection
+                out.close();
+            }
+
+            // Catch block to handle the exceptions
+            catch (IOException e) {
+
+                // Display message when exception occurs
+                System.out.println("exception occurred" + e);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -331,7 +393,6 @@ public static void mycourses(){
         try {
             stmt=conn.createStatement();
             String query = "select * from grades;";
-            System.out.println(query);
             try {
                 ResultSet rs;
                 ResultSetMetaData rsmd;
@@ -449,7 +510,9 @@ String query="select * from registration_status where instructor_id='"+user_id+"
 
     public static void submitgrades(){
         String csvFilePath="src/main/resources/grades.csv";
-        String sql = "INSERT INTO grades (student_id, course_id, grade, semester, academic_year) VALUES (?, ?, ?, ?, ?)";
+
+        String cd="";
+        String sql = "INSERT INTO grades (student_id,instructor_id, course_id, grade, semester, academic_year) VALUES (?, ?, ?, ?, ?, ?)";
         PreparedStatement statement = null;
         try {
             statement = conn.prepareStatement(sql);
@@ -472,7 +535,6 @@ String query="select * from registration_status where instructor_id='"+user_id+"
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         while (true) {
             try {
                 if (!((lineText = lineReader.readLine()) != null)) break;
@@ -486,19 +548,24 @@ String query="select * from registration_status where instructor_id='"+user_id+"
             }
             String student_id = data[0];
             String course_id = data[1];
+
+            cd=course_id;
             String grade = data[2];
             String semester = data[3];
             String academic_year = data[4] ;
 
             try{
+
                 statement.setString(1, student_id);
-                statement.setString(2, course_id);
+                statement.setString(2, user_id);
 
-                statement.setString(3, grade);
+                statement.setString(3, course_id);
 
-                statement.setString(4, semester);
+                statement.setString(4, grade);
 
-                statement.setString(5, academic_year);
+                statement.setString(5, semester);
+
+                statement.setString(6, academic_year);
             }
             catch (Exception e){
                 System.out.println(e);
@@ -509,8 +576,13 @@ String query="select * from registration_status where instructor_id='"+user_id+"
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-
-
+count++;
+        }
+        if(count==0){
+            System.out.println("plese enter some data in the file");
+            System.out.println("press any key to continue");
+            input.nextLine();
+            return;
         }
 
         try {
@@ -518,7 +590,35 @@ String query="select * from registration_status where instructor_id='"+user_id+"
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-System.out.println("grades submitted successfully");
+
+        String query="select * from registration_status where course_id='"+cd+"';";
+        try {
+            stmt= conn.createStatement();
+            ResultSet rs=stmt.executeQuery(query);
+            while(rs.next()){
+                String sid=rs.getString(2);
+                query="select * from grades where student_id='"+sid+"' and course_id='"+cd+"';";
+//                System.out.println(query);
+                ResultSet rs1=stmt.executeQuery(query);
+                int f=0;
+                while(rs1.next())f++;
+                if(f==0){
+                    System.out.println("no grade has been submitted for student with id "+sid);
+                    query="delete from grades where instructor_id='"+user_id+"' and course_id='"+cd+"';";
+                    stmt.executeUpdate(query);
+                } else if (f>1) {
+                    System.out.println("more than 1  grade has been submitted for student with id "+sid);
+                    query="delete from grades where instructor_id='"+user_id+"' and course_id='"+cd+"';";
+                    stmt.executeUpdate(query);
+
+                }
+            }
+        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+        }
+
+
+        System.out.println("grades submitted successfully");
         System.out.println("press any key to continue");
         input.nextLine();
         // execute the remaining queries

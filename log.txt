@@ -1,0 +1,21 @@
+student 2020csb2 logged in on 2023/02/20 18:07:47
+student 2020csb2 logged out on 2023/02/20 18:16:13
+instructor CS1 logged in on 2023/02/20 18:16:59
+instrcutor CS1 logged out on 2023/02/20 18:17:56
+instrcutor CS1 logged out on 2023/02/20 18:20:52
+instrcutor CS1 logged out on 2023/02/20 18:21:25
+instructor CS1 logged out on 2023/02/20 18:23:11
+instructor CS1 logged out on 2023/02/20 18:24:20
+instructor CS1 logged in on 2023/02/20 18:24:48
+instructor CS1 logged out on 2023/02/20 18:24:55
+admin  logged in on 2023/02/20 18:25:37
+admin  logged out on 2023/02/20 18:44:02
+student 2020csb1 logged in on 2023/02/20 18:51:07
+student 2020csb1 logged out on 2023/02/20 18:51:56
+instructor CS1 logged in on 2023/02/20 18:52:22
+instructor CS1 logged out on 2023/02/20 19:35:40
+student 2020csb1 logged in on 2023/02/20 19:36:48
+student 2020csb1 logged out on 2023/02/20 19:52:29
+instructor CS1 logged in on 2023/02/20 19:53:52
+instructor CS1 logged out on 2023/02/20 19:54:08
+student 2020csb1 logged in on 2023/02/20 19:54:19

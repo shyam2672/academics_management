@@ -3,19 +3,25 @@ import javax.swing.*;
 import java.util.Scanner;
 import java.sql.*;
 import java.sql.Connection;
+import java.io.*;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 public class student {
     static Connection conn = Connect.ConnectDB();
     static Statement stmt = null;
     static Scanner input = new Scanner(System.in);
     public static String user_id="";
+
+    public static String token="'logged in'";
+
     public static boolean user=false;
     public static String batch_id="";
-
+static int credits=0;
     public static void login(){
         String email="",password="";
         while(true){
@@ -30,11 +36,13 @@ public class student {
                 ResultSet rs;
 
                 rs=stmt.executeQuery(query);
+
                 int f=0;
                 while(rs.next()){
                    f++;
                     user_id=rs.getString(1);
                     batch_id=rs.getString(3);
+                    credits=rs.getInt(7);
                 }
 
                 if( f==0){
@@ -44,8 +52,32 @@ public class student {
                 }
                 else{
                     user=true;
-
+                    query="update student set token="+token+" where id='"+user_id+"';";
+                    stmt.executeUpdate(query);
                     System.out.println("logged in successfully");
+
+                    try {
+
+                        // Open given file in append mode by creating an
+                        // object of BufferedWriter class
+                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                        LocalDateTime now = LocalDateTime.now();
+                        String time= dtf.format(now);
+                        BufferedWriter out = new BufferedWriter(
+                                new FileWriter("log.txt", true));
+query="student "+user_id+" logged in on "+ time +"\n";
+                        // Writing on output stream
+                        out.write(query);
+                        // Closing the connection
+                        out.close();
+                    }
+
+                    // Catch block to handle the exceptions
+                    catch (IOException e) {
+
+                        // Display message when exception occurs
+                        System.out.println("exception occurred" + e);
+                    }
                     return;
 
                 }
@@ -57,6 +89,42 @@ public class student {
                 input.nextLine();
             }
 
+        }
+    }
+    public static void logout(){
+        user=false;
+        String query="update student set token="+"'logged out'"+" where id='"+user_id+"';";
+//        System.out.println(query);
+        try {
+
+            stmt= conn.createStatement();
+            stmt.executeUpdate(query);
+
+            try {
+
+                // Open given file in append mode by creating an
+                // object of BufferedWriter class
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                LocalDateTime now = LocalDateTime.now();
+                String time= dtf.format(now);
+                BufferedWriter out = new BufferedWriter(
+                        new FileWriter("log.txt", true));
+                query="student "+user_id+" logged out on "+ time +"\n";
+                // Writing on output stream
+                out.write(query);
+                // Closing the connection
+                out.close();
+            }
+
+            // Catch block to handle the exceptions
+            catch (IOException e) {
+
+                // Display message when exception occurs
+                System.out.println("exception occurred" + e);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
     public static void viewprofile()
@@ -166,20 +234,47 @@ String instructor_id="";
                     rs=stmt.executeQuery(query);
 int f=0;
 while(rs.next()){f++;cgpa_limit=rs.getInt(2);instructor_id=rs.getString(3);}
-if(f==0){System.out.println("no such course is offered");continue;}
+if(f==0){System.out.println("no such course is offered");
+    System.out.println("press any key to continue");
+    input.nextLine();
+    continue;}
 
                 }
                 catch (SQLException e){
                     System.out.println("no such course is offered");
+                    System.out.println(e);
+
+                    System.out.println("press any key to continue");
+                    input.nextLine();
                     continue;
                 }
+if(islessthantwo()==false) {
+    double cgpa = getcgpa();
+    if (cgpa > 0 && cgpa < cgpa_limit) {
+        System.out.println("you cannot take this course as your cgpa is less than required " + cgpa_limit);
+        System.out.println("press any key to continue");
+        input.nextLine();
+        continue;
+    }
+}
 
-                double cgpa=getcgpa();
-              if(cgpa>0 && cgpa<cgpa_limit){
-                  System.out.println("you cannot take this course as your cgpa is less than required " +cgpa_limit);
-                  continue;
+query="select * from course where course_id='"+course_id+"';";
+              try{
+                  ResultSet rs= stmt.executeQuery(query);
+                  int c=0;
+                  while (rs.next()){
+                      c=rs.getInt(7);
+                  }
+                  if(credits+c>24){
+                      System.out.println("your credit limit has exceeded for this semester");
+                      System.out.println("press any key to continue");
+                      input.nextLine();
+                      continue;
+                  }
               }
-
+              catch (SQLException e){
+                  System.out.println(e);
+              }
 
 
 
@@ -211,15 +306,19 @@ if(f==0){System.out.println("no such course is offered");continue;}
                    }
 
 
-if(flag==0)
-continue;
+if(flag==0){
+    System.out.println("press any key to continue");
+    input.nextLine();
+    continue;
+
+}
                         query="insert into registration_status(course_id,student_id,instructor_id,status) values ('"+course_id+"','"+user_id+"','"+instructor_id+"',"+"'pending instructor approval');";
                         stmt.executeUpdate(query);
                         System.out.println("Added course successfully");
 
                 }
                 catch (SQLException e){
-                    System.out.println(e);
+//                    System.out.println(e);
                 }
 
             } catch (SQLException e) {
@@ -346,7 +445,48 @@ continue;
 
     public static void showGrades()
     {
+             String query="select * from grades where student_id='"+user_id+"';";
+        try {
+            stmt= conn.createStatement();
+            ResultSet rs=stmt.executeQuery(query);
+            ResultSetMetaData rsmd;
+            rsmd=rs.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+            String responseQuery="";
+            int f=0;
+            while (rs.next()) {
+                f++;
+                for (int i = 1; i <= columnsNumber; i++) {
 
+                    if (i == 1)
+                        responseQuery += "student_id ---> ";
+                    if (i == 2)
+                        responseQuery += "instructor_id ---> ";
+                    if (i == 3)
+                        responseQuery += "course_id ---> ";
+                    if (i == 4)
+                        responseQuery += "grade ---> ";
+                    if (i == 5)
+                        responseQuery += "semester ---> ";
+                    if (i == 6)
+                        responseQuery += "academic_year ---> ";
+
+                    String columnValue = rs.getString(i);
+                    responseQuery += columnValue+"          ";
+                    // System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                }
+                responseQuery+="\n\n";
+            }
+            if(f==0){
+                System.out.println("No grades to show yet");
+
+            }
+            System.out.println(responseQuery);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("press any key to continue");
+        input.nextLine();
     }
 
     public static double getcgpa()
@@ -441,6 +581,25 @@ String query="\n" +
 //            throw new RuntimeException(e);
             System.out.println(e);
         }
+    }
+
+
+    public static boolean islessthantwo (){
+        String query="select count(*) from grades where student_id='"+user_id+"' GROUP BY academic_year,semester;";
+        int f=0;
+        try {
+            stmt= conn.createStatement();
+            ResultSet rs=stmt.executeQuery(query);
+            while(rs.next()){
+                f++;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        if(f<2)return true;
+        else return false;
     }
 
 }
