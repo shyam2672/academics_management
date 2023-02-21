@@ -59,8 +59,8 @@ if(fs==0 && fi==0){
     System.out.println("1. student");
     System.out.println("2. instructor");
     System.out.println("3. admin");
-
-    c=input.nextLine();
+c=input.nextLine();
+//    System.out.println("f");
     if(c.equals("0")){break;}
 }
 
@@ -236,23 +236,115 @@ if(fs==0 && fi==0){
 
                             }
 
-                            case "4": x.startsem();
+                            case "4": {
+                                String academic_year,semester;
+                                System.out.println("enter the academic year");
+                                academic_year=input.nextLine();
+                                System.out.println("enter the semester monsoon/winter");
+                                semester=input.nextLine();
+                               String resp= x.startsem(academic_year,semester);
+                                System.out.println(resp);
+                                if(!resp.equals("a sem is already running")) {
+                                    System.out.println("please add course to the current sem's course catalog");
+                                }
+                                System.out.println("press any key to continue");
+                                input.nextLine();
                                 break;
-                            case "5": x.endsem();
+
+                            }
+                            case "5":
+                                x.endsem();
+                                System.out.println("press any key to continue");
+                                input.nextLine();
                                 break;
-                            case "6": x.updatecoursecatalog();
+                            case "6": while(true){
+                                String course_id;
+                                System.out.println("enter course code or enter 0 to exit");
+                                course_id=input.nextLine();
+                                if(course_id.equals("0")){
+                                    break;
+                                }
+                                x.updatecoursecatalog(course_id);
+                            }
+                            case "7":
+                                while(true){
+                                    String student_id="0";
+                                    System.out.println("enter student_id or 0 to exit");
+                                    student_id=input.nextLine();
+                                    if(student_id.equals("0"))break;
+                                    x.showGrades(student_id);
+                                    System.out.println("press any key to continue");
+                                    input.nextLine();
+                                }
                                 break;
-                            case "7":x.showGrades();
+                            case "8":
+                                int f=1;
+                                while (f==1){
+                                    System.out.println("press \n0 to exit\n1 to add student\n2 to add instructor");
+                                    String role=input.nextLine();
+                                    List<String> data=new ArrayList<String>();
+                                    switch(role){
+                                        case "0": f=1;
+                                        break;
+                                        case "1":
+                                        {
+                                            String student_name="",batch_id="",phone_number="";
+                                            System.out.println("enter name of the student");
+                                            student_name=input.nextLine();
+                                            System.out.println("enter batch_id of the student");
+                                            batch_id=input.nextLine();
+                                            System.out.println("enter phone number of the student");
+                                            phone_number=input.nextLine();
+                                            data.add(student_name);
+                                            data.add(batch_id);
+                                            data.add(phone_number);
+                                            x.adduser("1",data);
+                                        }
+                                        break;
+                                        case "2":
+                                        {
+                                            String instructor_name="",dep_id="",phone_number="";
+                                            System.out.println("enter name of the student");
+                                            instructor_name=input.nextLine();
+                                            System.out.println("enter batch_id of the student");
+                                            dep_id=input.nextLine();
+                                            System.out.println("enter phone number of the student");
+                                            phone_number=input.nextLine();
+                                            data.add(instructor_name);
+                                            data.add(dep_id);
+                                            data.add(phone_number);
+                                            x.adduser("2",data);
+                                        }
+                                        break;
+                                        default: System.out.println("enter valid role");
+                                    }
+                                }
                                 break;
-                            case "8":x.adduser();
+                            case "9":{
+                                String student_id="";
+                                System.out.println("keep the transcript file ready");
+                                System.out.println("enter the student_id");
+                                student_id=input.nextLine();
+                                x.submittranscript(student_id);
+                            }
                                 break;
-                            case "9":x.submittransscript();
-                                break;
-                            case "10":admin.viewtranscript();
+                            case "10":
+                                String student_id="";
+                                System.out.println("enter student id");
+                                student_id=input.nextLine();
+                                x.viewtranscript(student_id);
                             break;
-                            case "11":admin.viewcourses();
+                            case "11":x.viewcourses();
+                                System.out.println("press any key to continue");
+                                input.nextLine();
                                 break;
-                            case "12":admin.viewusers();
+                            case "12":
+                                String rol="0";
+                                System.out.println("enter 1 for student and 2 for instructor");
+                                rol=input.nextLine();
+                                x.viewusers(rol);
+                                System.out.println("press any key to continue");
+                                input.nextLine();
                                 break;
                             default:System.out.println("please follow the instructions");
                                 break;
@@ -264,7 +356,6 @@ if(fs==0 && fi==0){
                     System.out.println("invalid role");
                     break;
             }
-            input.close();
 
         }
 

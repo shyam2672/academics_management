@@ -196,10 +196,10 @@ public boolean deletefromcurriculum(String course_id,String batch_id){
         return false;
     }
 }
-    public static void showGrades(){
+    public boolean showGrades(String student_id){
         try {
             stmt=conn.createStatement();
-            String query = "select * from grades;";
+            String query = "select * from grades where student_id='"+student_id+"';";
             try {
                 ResultSet rs;
                 ResultSetMetaData rsmd;
@@ -231,30 +231,33 @@ public boolean deletefromcurriculum(String course_id,String batch_id){
 
                 }
                 System.out.println(responseQuery);
-                System.out.println("press any key to continue");
-                input.nextLine();
             } catch (SQLException e) {
                 System.out.println(e);
+                return false;
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
         }
+        return true;
     }
 
-    public static void adduser(){
-        while(true){
-            System.out.println("press \n0 to exit\n1 to add student\n2 to add instructor");
-            String role=input.nextLine();
+    public String  adduser(String role,List<String> data){
+String id;
             switch (role){
-                case "0": {return;}
                 case "1":
-                {String id,name,batch_id,phone_number,password;
-              System.out.println("enter name of the student");
-              name=input.nextLine();
-                    System.out.println("enter batch_id of the student");
-                    batch_id=input.nextLine();
-                    System.out.println("enter phone number of the student");
-                    phone_number=input.nextLine();
+                {     String name="",batch_id="",phone_number="",password;
+                    int h=0;
+           for (String s:data) {
+              if(h==0)name=s;
+              if(h==1)batch_id=s;
+              if(h==2)phone_number=s;
+              h++;
+           }
+           if(batch_id.equals("")) {
+           System.out.println("please enter valid data");
+           return "failed";
+           }
                     try {
                         stmt=conn.createStatement();
                     try {
@@ -281,29 +284,36 @@ public boolean deletefromcurriculum(String course_id,String batch_id){
 
                     } catch (SQLException e) {
                         System.out.println(e);
+                        return "failed";
                     }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                        System.out.println(e);
+                        return "failed";
             }
                     break;}
-                case "2": {
-                    String id, name,dep_id, phone_number;
-                    System.out.println("enter name of the instructor");
-                    name = input.nextLine();
-                    System.out.println("enter dep_id of the instructor");
-                    dep_id = input.nextLine();
-                    System.out.println("enter phone number of the instructor");
-                    phone_number = input.nextLine();
+                case "2":
+                {     String name="",dep_id="",phone_number="",password;
+                    int h=0;
+                    for (String s:data) {
+                        if(h==0)name=s;
+                        if(h==1)dep_id=s;
+                        if(h==2)phone_number=s;
+                        h++;
+                    }
+                    if(dep_id.equals("")) {
+                        System.out.println("please enter valid data");
+                        return "failed";
+                    }
                     try {
-                        stmt = conn.createStatement();
+                        stmt=conn.createStatement();
                         try {
                             ResultSet rs;
                             ResultSetMetaData rsmd;
-                            String query = "select count(*) from instructor where dep_id='"+dep_id+"';";
-                            rs = stmt.executeQuery(query);
-                            rsmd = rs.getMetaData();
+                            String query="select count(*) from instructor where dep_id='"+dep_id+"';";
+                            rs= stmt.executeQuery(query);
+                            rsmd=rs.getMetaData();
                             int columnsNumber = rsmd.getColumnCount();
-                            String responseQuery = "";
+                            String responseQuery="";
                             while (rs.next()) {
                                 for (int i = 1; i <= columnsNumber; i++) {
 
@@ -314,34 +324,54 @@ public boolean deletefromcurriculum(String course_id,String batch_id){
                                 }
 
                             }
-                            id = dep_id + responseQuery;
-                            query = "insert into instructor(id,name,dep_id,email,password,phone_number,token) values('" + id + "','" + name + "','" + dep_id + "','" + id + "@iitrpr.ac.in','" + "iitropar','" + phone_number + "','');";
-                            System.out.println(query);
+                            id=dep_id+responseQuery;
+                            query="insert into instructor(id,name,dep_id,email,password,phone_number,token) values('"+id+"','"+name+"','"+dep_id+"','"+id+"@iitrpr.ac.in','"+ "iitropar','"+phone_number+"','');";
                             stmt.executeUpdate(query);
+
                         } catch (SQLException e) {
                             System.out.println(e);
+                            return "failed";
                         }
                     } catch (SQLException e) {
-                        throw new RuntimeException(e);
+                        System.out.println(e);
+                        return "failed";
                     }
-                    break;
-                }
+                    break;}
                 default:System.out.println("please follow the instructions");
+                return "failed";
 
             }
-        }
+
+        return id;
     }
 
-    public static void startsem(){
+    public boolean deleteuser(String role,String id){
+        String query="";
+        if(role=="1")
+         query="delete from student where id='"+id+"';";
+        else if(role=="2")
+            query="delete from student where id='"+id+"';";
+
+
+        try {
+            stmt= conn.createStatement();
+            stmt.executeUpdate(query);
+            return true;
+        } catch (SQLException e) {
+            System.out.println(e);
+            return false;
+        }
+    }
+    public String startsem(String academic_year,String semester){
         try {
             ResultSet rs;
             stmt=conn.createStatement();
 
             rs=stmt.executeQuery("select *from semester;");
             System.out.println("A sem is already running");
-            System.out.println("press any key to continue");
-            input.nextLine();
-            return;
+//            System.out.println("press any key to continue");
+//            input.nextLine();
+            return "a sem is already running";
         } catch (SQLException e) {
 
         }
@@ -375,11 +405,7 @@ public boolean deletefromcurriculum(String course_id,String batch_id){
                 ");";
         String s8="update student set credits=0";
 
-        String academic_year,semester;
-        System.out.println("enter the academic year");
-        academic_year=input.nextLine();
-        System.out.println("enter the semester monsoon/winter");
-        semester=input.nextLine();
+
 
         try {
             stmt=conn.createStatement();
@@ -392,6 +418,7 @@ public boolean deletefromcurriculum(String course_id,String batch_id){
 
 String query="insert into semester(academic_year,semester) values('"+academic_year+"','"+semester+"');";
                stmt.executeUpdate(query);
+               return academic_year+"-"+semester+" started successfully";
             } catch (SQLException e) {
                 System.out.println(e);
             }
@@ -399,14 +426,28 @@ String query="insert into semester(academic_year,semester) values('"+academic_ye
             throw new RuntimeException(e);
         }
 
+   return "1";
 
-        System.out.println( academic_year+"-"+semester+" started successfully");
-        System.out.println("please add course to the current sem's course catalog");
-        System.out.println("press any key to continue");
-        input.nextLine();
+    }
+public String viewsemester(){
+    String academic_year="",sem="";
+
+    try {
+        ResultSet rs;
+        stmt=conn.createStatement();
+
+        rs=stmt.executeQuery("select *from semester;");
+        while(rs.next()){
+            academic_year=rs.getString(1);
+            sem=rs.getString(2);
+        }
+        return academic_year+"-"+sem+" semester";
+    } catch (SQLException e) {
+return "no sem is running";
     }
 
-    public static void endsem(){
+}
+    public  boolean endsem(){
         String academic_year="",sem="";
         try {
             ResultSet rs;
@@ -420,9 +461,8 @@ String query="insert into semester(academic_year,semester) values('"+academic_ye
 
         } catch (SQLException e) {
             System.out.println("No sem is running");
-            System.out.println("press any key to continue");
-            input.nextLine();
-            return;
+
+            return false;
         }
         try {
             stmt.execute("drop table semester;");
@@ -437,11 +477,10 @@ String query="insert into semester(academic_year,semester) values('"+academic_ye
             throw new RuntimeException(e);
         }
         System.out.println( academic_year+"-"+sem+" ended successfully");
-        System.out.println("press any key to continue");
-        input.nextLine();
+       return true;
     }
 
-    public static void updatecoursecatalog(){
+    public boolean updatecoursecatalog(String course_id){
         try {
             ResultSet rs;
             stmt=conn.createStatement();
@@ -451,51 +490,58 @@ String query="insert into semester(academic_year,semester) values('"+academic_ye
 
         } catch (SQLException e) {
             System.out.println("sem is not yet started");
-            System.out.println("press any key to continue");
-            input.nextLine();
-            return;
+
+            return false;
         }
-        while (true){
-            String course_id;
-            System.out.println("enter course code or enter 0 to exit");
-            course_id=input.nextLine();
-            if(course_id.equals("0")){
-                return;
-            }
+
             try {
                 stmt=conn.createStatement();
                 String query = "INSERT INTO course_catalog(course_id) VALUES('" + course_id + "');" ;
-                System.out.println(query);
                 try {
                     stmt.executeUpdate(query);
                 } catch (SQLException e) {
                     System.out.println(e);
+                    return false;
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                System.out.println(e);
+                return false;
             }
-        }
 
-
+return true;
     }
-    public static void submittransscript(){
-        String student_id;
-        System.out.println("keep the transcript file ready");
-        System.out.println("enter the student_id");
-        student_id=input.nextLine();
+    public boolean deletefromcoursecatalog(String course_id){
+        String q="delete from course_catalog where course_id='"+course_id+"';";
+        try {
+
+            stmt= conn.createStatement();
+            stmt.executeUpdate(q);
+
+        } catch (SQLException e) {
+            System.out.println(e);
+            return false;
+        }
+        return true;
+    }
+    public boolean submittranscript(String student_id){
+
 
         File file = new File("src/main/resources/transcript.txt");
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
         }
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement("INSERT INTO transcript VALUES (?, ?)");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
         }
 
         try {
@@ -504,76 +550,106 @@ String query="insert into semester(academic_year,semester) values('"+academic_ye
             ps.executeUpdate();
             ps.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
         }
 
         try {
             fis.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
         }
-
+return true;
 
     }
 
-    public static void viewtranscript(){
-        String student_id="";
-        String transcript="";
-        System.out.println("enter student id");
-        student_id=input.nextLine();
+    public boolean deletetranscript(String student_id){
+        String q="delete from transcript where student_id='"+student_id+"';";
+        try {
+            stmt= conn.createStatement();
+            stmt.executeUpdate(q);
+        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean viewtranscript(String student_id){
+      String transcript="";
         PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement("SELECT transcript FROM transcript WHERE student_id = ?");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
         }
 
         try {
             ps.setString(1, student_id);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
         }
         ResultSet rs = null;
         try {
             rs = ps.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
         }
         if (rs != null) {
             while (true) {
                 try {
                     if (!rs.next()) break;
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+//                    throw new RuntimeException(e);
+                    System.out.println(e);
+                    return false;
                 }
+
                 try {
                     byte[] imgBytes = rs.getBytes(1);
                     transcript=new String(imgBytes);
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+//                    throw new RuntimeException(e);
+                    System.out.println(e);
+                    return false;
                 }
                 // use the data in some way here
             }
             try {
                 rs.close();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                System.out.println(e);
+                return false;
+//                throw new RuntimeException(e);
             }
         }
         else{
             System.out.println("no transcript for this student");
+            return false;
         }
         try {
             ps.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
+//            throw new RuntimeException(e);
         }
 System.out.println(transcript);
-        System.out.println("press any key to continue");
-        input.nextLine();
+      return true;
     }
 
-    public static void viewcourses(){
+    public boolean viewcourses(){
         String query="select * from course;";
 
         try {
@@ -609,18 +685,17 @@ System.out.println(transcript);
                 responseQuery+="\n";
             }
             System.out.println(responseQuery);
-            System.out.println("press any key to continue");
-            input.nextLine();
+
         } catch (SQLException e) {
             System.out.println("no courses to show");
-            throw new RuntimeException(e);
+            return false;
+//            throw new RuntimeException(e);
         }
+        return true;
     }
 
-    public static void viewusers(){
-        String c="0";
-        System.out.println("enter 1 for student and 2 for instructor");
-        c=input.nextLine();
+    public boolean viewusers(String c){
+
         String query="select * from student;";
         if(c.equals("1")){
             try {
@@ -655,8 +730,11 @@ System.out.println(transcript);
                 }
                 System.out.println(responseQuery);
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+//                throw new RuntimeException(e);
+                System.out.println(e);
+                return false;
             }
+
 
         }
         else if(c.equals("2")){
@@ -693,14 +771,15 @@ System.out.println(transcript);
                 }
                 System.out.println(responseQuery);
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+//                throw new RuntimeException(e);
+                System.out.println(e);
+                return false;
             }
         }
         else{
             System.out.println("you entered incorrect role");
         }
-        System.out.println("press any key to continue");
-        input.nextLine();
+      return true;
     }
 
 }

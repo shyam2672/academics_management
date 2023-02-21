@@ -1,9 +1,6 @@
 package org.example;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +11,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class adminTest {
 
     admin x=new admin();
+   String dummystudentid="",dummyinstructorid;
+    @AfterAll
+    @Test
+    void deleteuserdummies(){
 
+        assertTrue(x.deleteuser("1",dummystudentid));
+        assertTrue(x.deleteuser("2",dummyinstructorid));
+    }
     @AfterAll
     @Test
     void deletebatchdummies(){
@@ -26,6 +30,8 @@ class adminTest {
         assertTrue(x.deletecourse("DM100"));
         assertTrue(x.deletecourse("DM101"));
     }
+
+
 
     @AfterAll
     @Test
@@ -72,37 +78,98 @@ class adminTest {
 
     @Test
     void showGrades() {
+//          String grades=x.showGrades();
+        boolean f=x.showGrades("2020csb0");
     }
-
+//
     @Test
     void adduser() {
+        List<String> data=new ArrayList<String>();
+        data.add("dummy");
+        data.add("2020csb");
+        data.add("9327223367");
+          String f=x.adduser("1",data);
+        List<String> data2=new ArrayList<String>();
+        data2.add("dummy");
+        data2.add("CS");
+        data2.add("9327223367");
+        String f2=x.adduser("2",data2);
+        assertNotEquals(f,"failed");
+        assertNotEquals(f2,"failed");
+        dummystudentid=f;
+        dummyinstructorid=f2;
     }
 
     @Test
-    void startsem() {
+    void startsem(){
+        String resp=x.viewsemester();
+         String f=x.startsem("2026","monsoon");
+//         System.out.println(resp);
+         if(resp.equals("no sem is running")){
+             assertNotEquals(f,"a sem is already running");
+             boolean b=x.endsem();
+             assertEquals(b,true);
+         }
+         else{
+             assertEquals(f,"a sem is already running");
+         }
     }
 
     @Test
     void endsem() {
+        String resp=x.viewsemester();
+        boolean f=x.endsem();
+//         System.out.println(resp);
+        if(resp.equals("no sem is running")){
+         assertEquals(f,false);
+        }
+        else{
+            assertEquals(f,true);
+
+        }
     }
 
     @Test
     void updatecoursecatalog() {
+        String resp=x.viewsemester();
+        boolean f=x.updatecoursecatalog("DM111");
+        if(resp.equals("no sem is running")){
+assertEquals(f,false);
+        }
+        else{
+            assertEquals(f,true);
+           f= x.deletefromcoursecatalog("DM111");
+            assertEquals(f,true);
+
+        }
     }
 
     @Test
-    void submittransscript() {
+    void submitransscript() {
+boolean f=x.submittranscript("2020csb0");
+assertEquals(f,true);
+assertEquals(x.deletetranscript("2020csb0"),true);
     }
 
     @Test
     void viewtranscript() {
+        boolean f=x.submittranscript("2020csb0");
+        assertEquals(f,true);
+          f=x.viewtranscript("2020csb0");
+        assertEquals(f,true);
+
+        assertEquals(x.deletetranscript("2020csb0"),true);
+
     }
 
     @Test
     void viewcourses() {
+         assertEquals(x.viewcourses(),true);
     }
 
     @Test
     void viewusers() {
+        assertEquals(x.viewusers("1"),true);
+        assertEquals(x.viewusers("2"),true);
     }
 }

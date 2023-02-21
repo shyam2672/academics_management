@@ -162,7 +162,7 @@ query="student "+user_id+" logged in on "+ time +"\n";
                         responseQuery += "      phone_number ---> ";
                     if (i == 7)
                         responseQuery += "      credits ---> ";
-
+                     if(i==8)continue;
                         String columnValue = rs.getString(i);
                         responseQuery += columnValue+" ";
 
