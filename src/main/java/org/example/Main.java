@@ -3,6 +3,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -141,7 +143,16 @@ if(fs==0 && fi==0){
                     break;
                 case "3":
                     admin x=new admin();
-                    x.login();
+                    while(true){
+                        System.out.println("enter the username");
+                        x.username=input.nextLine();
+                        System.out.println("enter the password");
+                        x.password=input.nextLine();
+                        boolean f=x.login();
+                        if(f)break;
+                        else System.out.println("wrong credentials");
+                    }
+
                     int flag=1;
                     while(flag==1){
                         System.out.println("Press \n0. to logout \n1. to add a new batch\n2. to add a new course\n3. to add or update a curriculum\n4. to start sem\n5. to end sem\n6. to add course to course_catalog\n7. to view grades of all students\n8. to add users\n9. to generate student transcripts \n10. to view transcript\n11. to view courses\n12. to view users ");
@@ -153,12 +164,78 @@ if(fs==0 && fi==0){
                                 flag=0;
                                 x.logout();
                                 break;
-                            case "1": x.addbatch();
+                            case "1":{
+                                while(true){
+                                    String batch_id="",year="",dep_id="";
+
+                                    System.out.println("enter batch id");
+                                    batch_id=input.nextLine();
+                                    System.out.println("enter year");
+                                    year=input.nextLine();
+                                    System.out.println("enter department id");
+                                    dep_id=input.nextLine();
+                                    x.addbatch(batch_id,year,dep_id);
+                                    System.out.println("press 0 for exit and 1 to continue");
+                                    if(input.nextLine().equals("0")){
+                                        break;
+                                    }
+                                }
+
                                 break;
-                            case "2": x.addcourse();
+                            }
+                            case "2": {
+                                while(true){
+                                    String course_id="",course_name="",dep_id="",l,t,p,cc;
+                                    System.out.println("Enter course id");
+                                    course_id=input.nextLine();
+                                    System.out.println("Enter course name");
+                                    course_name=input.nextLine();
+                                    System.out.println("Enter dep_id");
+                                    dep_id=input.nextLine();
+                                    System.out.println("Enter number of lectures per week");
+                                    l=input.nextLine();
+                                    System.out.println("Enter number of tutorials per week");
+                                    t=input.nextLine();
+                                    System.out.println("Enter course practicals per week");
+                                    p=input.nextLine();
+                                    System.out.println("Enter course credits");
+                                    cc=input.nextLine();
+                                    List<String> prereq=new ArrayList<String>();
+                                    while (true){
+                                        String pre;
+                                        System.out.println("enter the course code of the prerequisite course of the course "+course_id+" or 0 to exit");
+                                        pre=input.nextLine();
+                                        if(pre.equals("0"))break;
+                                        prereq.add(pre);
+                                    }
+                                    x.addcourse(course_id,course_name,dep_id,l,t,p,cc,prereq);
+                                    System.out.println("press 0 for exit and 1 to continue");
+                                    if(input.nextLine().equals("0")){
+                                        break;
+                                    }
+                                }
                                 break;
-                            case "3": x.addcurriculum();
+
+                            }
+                            case "3":
+                            {
+                                while (true){
+                                    String course_id="",course_type,batch_id;
+                                    System.out.println("enter the course id or enter 0 to quit");
+                                    course_id=input.nextLine();
+                                    if(course_id.equals("0")){
+                                        break;
+                                    }
+                                    System.out.println("enter the batch_id ");
+                                    batch_id=input.nextLine();
+                                    System.out.println("enter the course type");
+                                    course_type=input.nextLine();
+                                    x.addcurriculum(course_id,course_type,batch_id);
+                                }
                                 break;
+
+                            }
+
                             case "4": x.startsem();
                                 break;
                             case "5": x.endsem();
@@ -187,7 +264,11 @@ if(fs==0 && fi==0){
                     System.out.println("invalid role");
                     break;
             }
+            input.close();
+
         }
+
+
         }
 
 }

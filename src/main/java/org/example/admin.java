@@ -2,6 +2,7 @@ package org.example;
 import java.io.*;
 import java.sql.*;
 import javax.swing.*;
+import java.util.List;
 import java.util.Scanner;
 
 import java.sql.*;
@@ -20,14 +21,11 @@ public class admin {
     static Statement stmt = null;
    static Scanner input = new Scanner(System.in);
 
-
-    public static void login(){
-        String username="",password="";
+   public  String username="",password="";
+public boolean user=false;
+    public  boolean login(){
         while(true){
-            System.out.println("enter username");
-            username=input.nextLine();
-            System.out.println("enter password");
-            password=input.nextLine();
+
 //            System.out.println(username + " "+ password);
             if(username.equals("admin") && password.equals("iitropar")){
                 try {
@@ -55,16 +53,21 @@ public class admin {
 
                     // Display message when exception occurs
                     System.out.println("exception occurred" + e);
+                    return false;
                 }
 
                 break;
             }
             else{
                 System.out.println("wrong credentials");
+                return false;
+
             }
         }
+        user=true;
+        return true;
     }
-public static void logout(){
+public  void logout(){
     try {
 
 
@@ -79,8 +82,8 @@ public static void logout(){
         String query="admin  logged out on "+ time +"\n";
         // Writing on output stream
         out.write(query);
-        System.out.println("logged in successfully");
-
+        System.out.println("logged out successfully");
+user=false;
         // Closing the connection
         out.close();
     }
@@ -93,16 +96,8 @@ public static void logout(){
     }
 
 }
-    public static void addbatch(){
-        while(true){
-            String batch_id="",year="",dep_id="";
+    public  boolean addbatch(String batch_id,String year,String dep_id){
 
-            System.out.println("enter batch id");
-            batch_id=input.nextLine();
-            System.out.println("enter year");
-            year=input.nextLine();
-            System.out.println("enter department id");
-            dep_id=input.nextLine();
 
             try {
                 stmt=conn.createStatement();
@@ -112,76 +107,67 @@ public static void logout(){
                     stmt.executeUpdate(query);
                 } catch (SQLException e) {
                    System.out.println(e);
+                   return false;
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                System.out.println(e);
+                return false;
             }
 
-            System.out.println("press 0 for exit and 1 to continue");
-            if(input.nextLine().equals("0")){
-                break;
-            }
-        }
+return true;
     }
+public boolean deletebatch(String batch_id){
+        String query="delete from batch where id='"+batch_id+"';";
+    try {
+        stmt= conn.createStatement();
+        stmt.executeUpdate(query);
+        return true;
+    } catch (SQLException e) {
+        System.out.println(e);
+        return false;
+    }
+}
+    public  boolean addcourse(String course_id, String course_name, String dep_id, String l, String t, String p, String c, List<String> prereq){
 
-    public static void addcourse(){
-        while(true){
-            String course_id="",course_name="",dep_id="",l,t,p,c;
-            System.out.println("Enter course id");
-            course_id=input.nextLine();
-            System.out.println("Enter course name");
-            course_name=input.nextLine();
-            System.out.println("Enter dep_id");
-            dep_id=input.nextLine();
-            System.out.println("Enter number of lectures per week");
-            l=input.nextLine();
-            System.out.println("Enter number of tutorials per week");
-            t=input.nextLine();
-            System.out.println("Enter course practicals per week");
-            p=input.nextLine();
-            System.out.println("Enter course credits");
-            c=input.nextLine();
             try {
                 stmt=conn.createStatement();
                 String query = "INSERT INTO course(id,name,dep_id,l,t,p,c) VALUES('" + course_id + "'," + "'"+course_name+"'," + "'"+dep_id+ "',"+l+","+t+","+p+","+c+");";
-                System.out.println(query);
+//                System.out.println(query);
 
                 try {
                     stmt.executeUpdate(query);
-                    while (true){
-                        String pre;
-                        System.out.println("enter the course code of the prerequisite course of the course "+course_id+" or 0 to exit");
-                        pre=input.nextLine();
-                        if(pre.equals("0"))break;
+                    for(String pre:prereq){
                         query="insert into prereq(course_id,prereq_id) values('"+course_id+"','"+pre+"');";
                         stmt.executeUpdate(query);
                     }
+
                 } catch (SQLException e) {
                     System.out.println(e);
+                    return false;
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                System.out.println(e);
+                return false;
             }
+return true;
 
-            System.out.println("press 0 for exit and 1 to continue");
-            if(input.nextLine().equals("0")){
-                break;
-            }
+    }
+    public boolean deletecourse(String course_id){
+        String query="delete from course where id='"+course_id+"';";
+        try {
+            stmt= conn.createStatement();
+            String q="delete from prereq where course_id='"+course_id+"' or prereq_id='"+course_id+"';";
+                    stmt.executeUpdate(q);
+            stmt.executeUpdate(query);
+            return true;
+        } catch (SQLException e) {
+            System.out.println(e);
+            return false;
         }
     }
 
-    public static void addcurriculum(){
-        while(true){
-            String course_id="",course_type,batch_id;
-            System.out.println("enter the course id or enter 0 to quit");
-            course_id=input.nextLine();
-            if(course_id.equals("0")){
-                return;
-            }
-            System.out.println("enter the batch_id ");
-            batch_id=input.nextLine();
-            System.out.println("enter the course type");
-            course_type=input.nextLine();
+    public  boolean addcurriculum(String course_id,String course_type,String batch_id){
+
             try {
                 stmt=conn.createStatement();
                 String query = "INSERT INTO ug_curriculum(course_id,batch_id,course_type) VALUES('" + course_id + "'," + "'"+batch_id+"'," + "'"+course_type+"');";
@@ -190,15 +176,26 @@ public static void logout(){
                     stmt.executeUpdate(query);
                 } catch (SQLException e) {
                     System.out.println(e);
+                    return false;
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                System.out.println(e);
+                return false;
+
             }
-
-
-        }
+            return true;
     }
-
+public boolean deletefromcurriculum(String course_id,String batch_id){
+    String query="delete from ug_curriculum where course_id='"+course_id+"' and batch_id='"+batch_id+"';";
+    try {
+        stmt= conn.createStatement();
+        stmt.executeUpdate(query);
+        return true;
+    } catch (SQLException e) {
+        System.out.println(e);
+        return false;
+    }
+}
     public static void showGrades(){
         try {
             stmt=conn.createStatement();
