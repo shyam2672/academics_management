@@ -18,17 +18,19 @@ public class Main {
             String c="";
 
             int fs=0,fi=0;
-
+student stu=new student();
+instructor ins=new instructor();
+admin x=new admin();
             String query="select * from student where token='logged in';";
 
             try {
                 stmt= conn.createStatement();
                 ResultSet rs=stmt.executeQuery(query);
                 while(rs.next()){
-                    student.user=true;
-                    student.user_id=rs.getString(1);
-                    student.batch_id=rs.getString(3);
-                    student.credits=rs.getInt(7);
+                    stu.user=true;
+                    stu.user_id=rs.getString(1);
+                    stu.batch_id=rs.getString(3);
+                    stu.credits=rs.getInt(7);
                     fs++;
                     c="1";
                 }
@@ -42,8 +44,8 @@ public class Main {
                     stmt= conn.createStatement();
                     ResultSet rs=stmt.executeQuery(query);
                     while(rs.next()){
-                        instructor.user=true;
-                        instructor.user_id=rs.getString(1);
+                        ins.user=true;
+                        ins.user_id=rs.getString(1);
                         fi++;
                         c="2";
                     }
@@ -68,38 +70,111 @@ c=input.nextLine();
             switch (c){
 
                 case "1":
-                    if(fs==0)
-                    student.login();
-                    while(student.user){
+
+                    if(fs==0){
+                        String email="",password="";
+                        while(true) {
+                            System.out.println("enter your email");
+                            email = input.nextLine();
+                            System.out.println("enter your password");
+                            password = input.nextLine();
+                            if(stu.login(email,password))break;
+                            else{
+                                System.out.println("wrong credentials");
+                                System.out.println("press any key to continue");
+                                input.nextLine();
+                            }
+
+                        }
+                    }
+                    while(stu.user){
                         System.out.println("Press \n0. to logout \n1. to view profile\n2. to update profile\n3. to view the offered courses\n4. to add course\n5. to delete Course\n6. to view your courses\n7. to view grades\n8. to view your cgpa\n9. to check graduation  ");
                         String r="";
 
                         r=input.nextLine();
                         switch (r){
                             case "0":
-                                student.logout();
+                                stu.logout();
                                 break;
-                            case "1":student.viewprofile();
-                                break;
-                            case "2": student.updateprofile();
-                                break;
-                            case "3": student.offeredCourses();
-                                break;
-                            case "4": student.addCourse();
-                                break;
-                            case "5": student.deleteCourse();
-                                break;
-                            case "6": student.mycourses();
-                                break;
-                            case "7":student.showGrades();
-                                break;
-                            case "8":double f=student.getcgpa();
-                            System.out.println(f);
+                            case "1":{
+                                stu.viewprofile();
                                 System.out.println("press any key to continue");
                                 input.nextLine();
                                 break;
-                            case "9":student.gradcheck();
+
+                            }
+                            case "2": {
+
+                                String name="",password="",phone_number;
+                                System.out.println("enter name to update");
+                                name=input.nextLine();
+                                System.out.println("enter phone number to update");
+                                phone_number=input.nextLine();
+                                System.out.println("enter password to update");
+                                password=input.nextLine();
+stu.updateprofile(name,password,phone_number);
+                                System.out.println("press any key to continue");
+                                input.nextLine();
                                 break;
+                            }
+                            case "3": while(true){
+                                String f = stu.offeredCourses();
+                                System.out.println("press any key to continue");
+                                input.nextLine();
+                                break;
+                            }
+                            case "4": {
+
+                                while(true){
+                                    String course_id;
+                                    System.out.println("enter the course_id or 0 to exit");
+                                    course_id = input.nextLine();
+                                    if (course_id.equals("0")) {
+                                        break;
+                                    }
+                                    stu.addCourse(course_id);
+                                    System.out.println("press any key to continue");
+                                    input.nextLine();
+
+                                }
+                            }
+                            case "5": while(true){
+                                String course_id;
+                                System.out.println("enter course_id to delete or 0 to exit");
+                                course_id=input.nextLine();
+                                if(course_id.equals("0")){
+                                    break;
+                                }
+                                stu.deleteCourse(course_id);
+                            }
+                            case "6": {
+                                stu.mycourses();
+                                System.out.println("press any key to continue");
+                                input.nextLine();
+                                break;
+                            }
+                            case "7": {
+                                stu.showGrades();
+                                System.out.println("press any key to continue");
+                                input.nextLine();
+                                break;
+                            }
+                            case "8": {
+                                double f = stu.getcgpa();
+                                System.out.println(f);
+                                System.out.println("press any key to continue");
+                                input.nextLine();
+                                break;
+                            }
+                            case "9": {
+                                if(stu.gradcheck())
+                                    System.out.println("eligible for graduation");
+                                    else
+                                    System.out.println("not eligible for graduation");
+                                System.out.println("press any key to continue");
+                                input.nextLine();
+                                break;
+                            }
 
                             default:System.out.println("please follow the instructions");
                                 break;
@@ -108,33 +183,123 @@ c=input.nextLine();
 
                     break;
                 case "2":
-                    if(fi==0)
-                    instructor.login();
-                    while(instructor.user){
-                        System.out.println("Press \n0. to logout \n1. to view profile\n2. to update profile\n3. to view the course catalog\n4. to add course\n5. to delete Course\n6. to view your courses\n7. to view grades of all students\n8. to approve or disapprove enrollments\n9. to submit grades  ");
+                    if(fi==0){
+                        while(true){
+                            String email="",password="";
+                            System.out.println("enter your email");
+                            email=input.nextLine();
+                            System.out.println("enter your password");
+                            password=input.nextLine();
+                            if(ins.login(email,password))break;
+                            else{
+                                System.out.println("wrong credentials");
+                                System.out.println("press any key to continue");
+                                input.nextLine();
+                            }
+
+                        }
+
+                    }
+                    while(ins.user){
+                        System.out.println("Press \n0. to logout \n1. to view profile\n2. to update profile\n3. to view the course catalog\n4. to add course\n5. to delete Course\n6. to view your courses\n7. to view grades of all students\n8. to view enrollment requests\n9.to approve or disapprove enrollment requests\n10. to submit grades  ");
                         String r="";
                         r=input.nextLine();
                         switch (r){
-                            case "0": instructor.logout();
+                            case "0": ins.logout();
                                 break;
-                            case "1":instructor.viewprofile();
+                            case "1": {
+                                String resp = ins.viewprofile();
+                                System.out.println(resp);
+                                System.out.println("press any key to continue");
+                                input.nextLine();
                                 break;
-                            case "2": instructor.updateprofile();
+                            }
+                            case "2": {
+                                String name="",password="",phone_number;
+                                System.out.println("enter name to update");
+                                name=input.nextLine();
+                                System.out.println("enter phone number to update");
+                                phone_number=input.nextLine();
+                                System.out.println("enter password to update");
+                                password=input.nextLine();
+                                if(ins.updateprofile(name,password,phone_number))
+                                System.out.println("profile updated successfully");
+                                else System.out.println("some error occurred");
+                                System.out.println("press any key to continue");
+                                input.nextLine();
                                 break;
-                            case "3": instructor.offeredCourses();
+                            }
+                            case "3": ins.offeredCourses();
+                                System.out.println("press any key to continue");
+                                input.nextLine();
                                 break;
-                            case "4": instructor.addCourse();
+                            case "4":
+                            while(true)
+                            {
+                                String course_id;
+                                System.out.println("enter the course_id or 0 to exit");
+                                course_id=input.nextLine();
+                                if(course_id.equals("0")){
+                                    break;
+                                }
+                                String cgpa_limit;
+                                System.out.println("set the cgpa limit for this course");
+                                cgpa_limit=input.nextLine();
+                                ins.addCourse(course_id,cgpa_limit);
+
+                            }
                                 break;
-                            case "5": instructor.deleteCourse();
+                            case "5":
+                                while(true){
+                                    String course_id;
+                                    System.out.println("enter course_id to delete or 0 to exit");
+                                    course_id=input.nextLine();
+
+                                    if(course_id.equals("0")){
+                                        break;
+                                    }
+                                    ins.deleteCourse(course_id);
+
+                                }
                                 break;
-                            case "6": instructor.mycourses();
+                            case "6": {
+                                String resp = ins.mycourses();
+                                System.out.println(resp);
+                                System.out.println("press any key to continue");
+                                input.nextLine();
                                 break;
-                            case "7":instructor.showGrades();
+                            }
+                            case "7":ins.showGrades();
+                                System.out.println("press any key to continue");
+                                input.nextLine();
                                 break;
-                            case "8":instructor.enrollmentRequests();
-                                break;
-                            case "9":instructor.submitgrades();
-                                break;
+                            case "8":{String resp=ins.enrollmentRequests();
+                            System.out.println(resp);
+                            System.out.println("press any key to continue");
+                            input.nextLine();
+                                break;}
+                            case "9":{
+                                while(true){
+                                    String course_id,student_id;
+                                    System.out.println("enter course_id or 0 to exit");
+                                    course_id=input.nextLine();
+                                    if(course_id.equals("0")){
+                                        break;
+                                    }
+                                    System.out.println("enter Student_id ");
+                                    student_id=input.nextLine();
+                                    String resp;
+                                    System.out.println("press 1 to approve and 2 to disapprove");
+                                    resp=input.nextLine();
+                                    ins.approveordissaprove(course_id,student_id,resp);
+                                }
+break;
+                            }
+                            case "10":{
+                                ins.submitgrades();
+                                System.out.println("press any key to continue");
+                                input.nextLine();
+                            }
                             default:System.out.println("please follow the instructions");
                                 break;
                         }
@@ -142,13 +307,13 @@ c=input.nextLine();
 
                     break;
                 case "3":
-                    admin x=new admin();
                     while(true){
+                        String username="",password="";
                         System.out.println("enter the username");
-                        x.username=input.nextLine();
+                        username=input.nextLine();
                         System.out.println("enter the password");
-                        x.password=input.nextLine();
-                        boolean f=x.login();
+                        password=input.nextLine();
+                        boolean f=x.login(username,password);
                         if(f)break;
                         else System.out.println("wrong credentials");
                     }
@@ -358,7 +523,6 @@ c=input.nextLine();
             }
 
         }
-
 
         }
 

@@ -41,9 +41,8 @@ class adminTest {
     @BeforeAll
     @Test
     void login() {
-         x.username="admin";
-         x.password="iitropar";
-         assertTrue(x.login());
+
+         assertTrue(x.login("admin","iitropar"));
     }
     @AfterAll
     @Test

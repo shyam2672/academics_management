@@ -1,5 +1,4 @@
 package org.example;
-import javax.swing.*;
 import java.util.Scanner;
 import java.sql.*;
 import java.sql.Connection;
@@ -22,13 +21,8 @@ public class student {
     public static boolean user=false;
     public static String batch_id="";
 static int credits=0;
-    public static void login(){
-        String email="",password="";
-        while(true){
-            System.out.println("enter your email");
-            email=input.nextLine();
-            System.out.println("enter your password");
-            password=input.nextLine();
+    public boolean login(String email,String password){
+
 
             String query="select * from student where email='"+email+"' and password='"+password+"';";
             try {
@@ -46,9 +40,7 @@ static int credits=0;
                 }
 
                 if( f==0){
-                    System.out.println("wrong credentials");
-                    System.out.println("press any key to continue");
-                    input.nextLine();
+                   return false;
                 }
                 else{
                     user=true;
@@ -77,21 +69,19 @@ query="student "+user_id+" logged in on "+ time +"\n";
 
                         // Display message when exception occurs
                         System.out.println("exception occurred" + e);
+                        return false;
                     }
-                    return;
 
                 }
 
             } catch (SQLException e) {
                 System.out.println(e);
-                System.out.println("wrong credentials");
-                System.out.println("press any key to continue");
-                input.nextLine();
+              return false;
             }
 
-        }
+        return true;
     }
-    public static void logout(){
+    public boolean logout(){
         user=false;
         String query="update student set token="+"'logged out'"+" where id='"+user_id+"';";
 //        System.out.println(query);
@@ -121,20 +111,19 @@ query="student "+user_id+" logged in on "+ time +"\n";
 
                 // Display message when exception occurs
                 System.out.println("exception occurred" + e);
+                return false;
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
         }
+        return true;
     }
-    public static void viewprofile()
+    public boolean viewprofile()
     {
-        if(!user){
-            System.out.println("please log in!");
-            System.out.println("press any key to continue");
-            input.nextLine();
-            return;
-        }
+
 
         String query="select * from student where id='"+user_id+"';";
 
@@ -171,26 +160,17 @@ query="student "+user_id+" logged in on "+ time +"\n";
 
             }
             System.out.println(responseQuery);
-            System.out.println("press any key to continue");
-            input.nextLine();
+
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
         }
+
+        return false;
+
     }
-    public static void updateprofile(){
-        if(!user){
-            System.out.println("please log in!");
-            System.out.println("press any key to continue");
-            input.nextLine();
-            return;
-        }
-        String name="",password="",phone_number;
-        System.out.println("enter name to update");
-        name=input.nextLine();
-        System.out.println("enter phone number to update");
-        phone_number=input.nextLine();
-        System.out.println("enter password to update");
-        password=input.nextLine();
+    public boolean updateprofile(String name,String password,String phone_number){
 
         String query =" update student set name='"+name+"',phone_number='"+phone_number+"',password='"+password+"' where id='"+user_id+"';";
 
@@ -198,30 +178,18 @@ query="student "+user_id+" logged in on "+ time +"\n";
             stmt=conn.createStatement();
             stmt.executeUpdate(query);
             System.out.println("profile updated successfully");
-            System.out.println("press any key to continue");
-            input.nextLine();
+
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            System.out.println(e);
+            return false;
         }
-
-
+return true;
     }
-    public static void addCourse(){
-        if(!user){
-            System.out.println("please log in!");
-            System.out.println("press any key to continue");
-            input.nextLine();
-            return;
-        }
+    public boolean addCourse(String course_id){
 
-        while(true){
-            String course_id;
-            System.out.println("enter the course_id or 0 to exit");
-            course_id=input.nextLine();
-            if(course_id.equals("0")){
-                return;
-            }
+
             try {
                 stmt= conn.createStatement();
                 String query="select * from course_offering where course_id='"+course_id+"';";
@@ -235,26 +203,20 @@ String instructor_id="";
 int f=0;
 while(rs.next()){f++;cgpa_limit=rs.getInt(2);instructor_id=rs.getString(3);}
 if(f==0){System.out.println("no such course is offered");
-    System.out.println("press any key to continue");
-    input.nextLine();
-    continue;}
+    return false;}
 
                 }
                 catch (SQLException e){
-                    System.out.println("no such course is offered");
                     System.out.println(e);
 
-                    System.out.println("press any key to continue");
-                    input.nextLine();
-                    continue;
+                    return false;
                 }
 if(islessthantwo()==false) {
     double cgpa = getcgpa();
     if (cgpa > 0 && cgpa < cgpa_limit) {
         System.out.println("you cannot take this course as your cgpa is less than required " + cgpa_limit);
-        System.out.println("press any key to continue");
-        input.nextLine();
-        continue;
+
+        return false;
     }
 }
 
@@ -267,13 +229,12 @@ query="select * from course where course_id='"+course_id+"';";
                   }
                   if(credits+c>24){
                       System.out.println("your credit limit has exceeded for this semester");
-                      System.out.println("press any key to continue");
-                      input.nextLine();
-                      continue;
+                      return false;
                   }
               }
               catch (SQLException e){
                   System.out.println(e);
+                  return false;
               }
 
 
@@ -299,17 +260,14 @@ query="select * from course where course_id='"+course_id+"';";
                                flag=0;
                            }
                        }catch (SQLException e){
-                           System.out.println("Complete the course "+prereq+" first to register this course");
-                           flag=0;
+                           System.out.println(e);
 
                        }
                    }
 
 
 if(flag==0){
-    System.out.println("press any key to continue");
-    input.nextLine();
-    continue;
+    return false;
 
 }
                         query="insert into registration_status(course_id,student_id,instructor_id,status) values ('"+course_id+"','"+user_id+"','"+instructor_id+"',"+"'pending instructor approval');";
@@ -322,13 +280,15 @@ if(flag==0){
                 }
 
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+//                throw new RuntimeException(e);
+                System.out.println(e);
             }
 
-        }
+
+        return true;
     }
 
-    public static void offeredCourses()  {
+    public String offeredCourses()  {
 
         String query="\n" +
                 "select course_offering.course_id,course_offering.cgpa_limit,ug_curriculum.course_type,course_offering.instructor_id\n" +
@@ -359,21 +319,17 @@ if(flag==0){
                   }
                   responseQuery+="\n";
               }
-              System.out.println(responseQuery);
-              System.out.println("press any key to continue");
-              input.nextLine();
+            return responseQuery;
 
           }
           catch (SQLException e){
                  System.out.println(e);
-                 System.out.println("no courses offered yet");
+                 return "no courses offered yet";
           }
 
     }
-    public static void mycourses(){
-
+    public String mycourses(){
         String query="select * from registration_status where student_id='"+user_id+"';";
-
         try {
             stmt= conn.createStatement();
             ResultSet rs=stmt.executeQuery(query);
@@ -396,54 +352,37 @@ if(flag==0){
                         responseQuery += "status ---> ";
 
                     String columnValue = rs.getString(i);
-                    responseQuery += columnValue+" ";
+                    responseQuery += columnValue+"      ";
                     // System.out.print(columnValue + " " + rsmd.getColumnName(i));
                 }
-                responseQuery+="\n";
+                responseQuery+="\n\n";
             }
             if(f==0){
-                System.out.println("you have no courses");
-                System.out.println("press any key to continue");
-                input.nextLine();
-                return;
+                return "you have no courses";
             }
-            System.out.println(responseQuery);
-            System.out.println("press any key to continue");
-            input.nextLine();
+            return responseQuery;
+
         } catch (SQLException e) {
-            System.out.println("you have no courses");
-        }
-    }
-    public static void deleteCourse()
-    {
-        if(!user){
-            System.out.println("please log in!");
-            System.out.println("press any key to continue");
-            input.nextLine();
-            return;
+            System.out.println(e);
+            return "error";
         }
 
-        while(true){
-            String course_id;
-            System.out.println("enter course_id to delete or 0 to exit");
-            course_id=input.nextLine();
-            if(course_id.equals("0")){
-                return;
-            }
+    }
+    public boolean deleteCourse(String course_id)
+    {
             String query="delete from registration_status where course_id='"+course_id+"' and student_id='"+user_id+"';";
             try {
                 stmt=conn.createStatement();
                 stmt.executeUpdate(query);
             } catch (SQLException e) {
-                System.out.println("you have not offered this course yet");
+                System.out.println("you have not added this course yet");
 //                throw new RuntimeException(e);
+                return false;
             }
-        }
-
-
+        return true;
     }
 
-    public static void showGrades()
+    public String showGrades()
     {
              String query="select * from grades where student_id='"+user_id+"';";
         try {
@@ -478,18 +417,16 @@ if(flag==0){
                 responseQuery+="\n\n";
             }
             if(f==0){
-                System.out.println("No grades to show yet");
-
+                return "No grades to show yet" ;
             }
-            System.out.println(responseQuery);
+            return responseQuery;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("press any key to continue");
-        input.nextLine();
+
     }
 
-    public static double getcgpa()
+    public double getcgpa()
     {
          String query="select * from grades where student_id='"+user_id+"';";
          double cgpa=0.0;
@@ -551,7 +488,7 @@ if(flag==0){
         return cgpa;
     }
 
-    public static void gradcheck(){
+    public boolean gradcheck(){
 String query="\n" +
         "select ug_curriculum.course_id\n" +
         "from ug_curriculum\n" +
@@ -568,23 +505,22 @@ String query="\n" +
                 f++;
             }
             if(f>0){
-                System.out.println("not eligible for graduation");
-
+return false;
             }
             else{
-                System.out.println("eligible for graduation");
+                return true;
 
             }
-            System.out.println("press any key to continue");
-            input.nextLine();
+
         } catch (SQLException e) {
 //            throw new RuntimeException(e);
             System.out.println(e);
+            return false;
         }
     }
 
 
-    public static boolean islessthantwo (){
+    public  boolean islessthantwo (){
         String query="select count(*) from grades where student_id='"+user_id+"' GROUP BY academic_year,semester;";
         int f=0;
         try {
@@ -595,7 +531,7 @@ String query="\n" +
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
         }
 
         if(f<2)return true;

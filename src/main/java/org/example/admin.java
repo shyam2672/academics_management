@@ -21,10 +21,8 @@ public class admin {
     static Statement stmt = null;
    static Scanner input = new Scanner(System.in);
 
-   public  String username="",password="";
 public boolean user=false;
-    public  boolean login(){
-        while(true){
+    public  boolean login(String username,String password){
 
 //            System.out.println(username + " "+ password);
             if(username.equals("admin") && password.equals("iitropar")){
@@ -56,14 +54,10 @@ public boolean user=false;
                     return false;
                 }
 
-                break;
             }
             else{
-                System.out.println("wrong credentials");
                 return false;
-
             }
-        }
         user=true;
         return true;
     }
@@ -350,7 +344,7 @@ String id;
         if(role=="1")
          query="delete from student where id='"+id+"';";
         else if(role=="2")
-            query="delete from student where id='"+id+"';";
+            query="delete from instructor where id='"+id+"';";
 
 
         try {
@@ -429,7 +423,7 @@ String query="insert into semester(academic_year,semester) values('"+academic_ye
    return "1";
 
     }
-public String viewsemester(){
+public static String viewsemester(){
     String academic_year="",sem="";
 
     try {
