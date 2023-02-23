@@ -421,7 +421,7 @@ String query="select * from registration_status where instructor_id='"+user_id+"
 
             }
             if(f==0){
-                return "no enrollments requests yet";
+                return "no enrollment requests yet";
             }
             return responseQuery;
 

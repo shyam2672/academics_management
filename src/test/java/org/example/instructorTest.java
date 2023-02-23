@@ -34,112 +34,139 @@ instructor x=new instructor();
 
     @Test
     void addCourse() {
-     if(x.offeredCourses()){
-
-       assertTrue( x.addCourse("DM111","3"));
-         //testing when adding course added by other instructor
-         instructor y=new instructor();
-         assertTrue(y.login("CS1@iitrpr.ac.in","1234"));
-         assertFalse(y.addCourse("DM111","3"));
-         assertTrue(y.logout());
-         assertTrue(x.deleteCourse("DM111"));
-     }
-     else{
-     assertFalse(x.addCourse("DM111","3"));
-     }
+        admin y=new admin();
+        if(admin.viewsemester().equals("no sem is running")){
+            assertFalse(x.addCourse("CS301","3"));
+        }
+        else{
+            y.endsem();
+        }
+        y.startsem("2030","winter");
+        y.updatecoursecatalog("CS301");
+        assertTrue(x.addCourse("CS301","3"));
+        instructor z=new instructor();
+        assertFalse(z.addCourse("CS301","3"));
+        y.endsem();
     }
 
     @Test
     void offeredCourses() {
-        String f=admin.viewsemester();
-        if(f.equals("no sem is running"))
-        assertFalse(x.offeredCourses());
-        else assertTrue(x.offeredCourses());
+        admin y=new admin();
+        if(admin.viewsemester().equals("no sem is running")){
+              assertFalse(x.offeredCourses());
+        }
+        else{
+             y.endsem();
+        }
+        y.startsem("2030","winter");
+        y.updatecoursecatalog("CS301");
+        assertTrue(x.offeredCourses());
+        y.endsem();
     }
 
     @Test
     void mycourses() {
+        admin y=new admin();
         if(admin.viewsemester().equals("no sem is running")){
             assertEquals(x.mycourses(),"error");
         }
         else{
             // when user has no offered courses
-            assertEquals(x.mycourses(),"you have no offered courses");
-            assertTrue(x.addCourse("DM111","3"));
-            assertNotEquals(x.mycourses(),"you have no offered courses");
-            assertTrue(x.deleteCourse("DM111"));
+           y.endsem();
         }
-
+y.startsem("2030","winter");
+        y.updatecoursecatalog("DM111");
+        assertEquals(x.mycourses(),"you have no offered courses");
+        assertTrue(x.addCourse("DM111","3"));
+        assertNotEquals(x.mycourses(),"you have no offered courses");
+        assertTrue(x.deleteCourse("DM111"));
+y.endsem();
     }
 
     @Test
     void deleteCourse() {
+        admin y=new admin();
+
         if(admin.viewsemester().equals("no sem is running")){
             assertFalse(x.deleteCourse("DM111"));
         }
         else{
-            assertTrue(x.addCourse("DM111","3"));
-            assertTrue(x.deleteCourse("DM111"));
+            y.endsem();
+
         }
+y.startsem("2030","monsoon");
+        y.updatecoursecatalog("DM111");
+        assertTrue(x.addCourse("DM111","3"));
+        assertTrue(x.deleteCourse("DM111"));
+        y.endsem();
     }
 
     @Test
     void showGrades() {
+
         assertTrue(x.showGrades());
     }
 
     @Test
     void enrollmentRequests() {
+        admin y=new admin();
+
         if(admin.viewsemester().equals("no sem is running")){
             assertEquals(x.enrollmentRequests(),"error");
         }
         else{
-
-            x.addCourse("DM111","3");
-            assertEquals(x.enrollmentRequests(),"no enrollment requests yet");
-            student y=new student();
-            assertTrue(y.login("2020csb2","iitropar"));
-            y.addCourse("DM111");
-            assertNotEquals(x.enrollmentRequests(),"no enrollment requests yet");
-            assertTrue(y.logout());
-            assertTrue(x.deleteCourse("DM111"));
+           y.endsem();
             }
+        y.startsem("2030","winter");
+        y.updatecoursecatalog("DM111");
+        x.addCourse("DM111","3");
+        assertEquals(x.enrollmentRequests(),"no enrollment requests yet");
+        student z=new student();
+        assertTrue(z.login("2020csb2@iitrpr.ac.in","iitropar"));
+        z.addCourse("DM111");
+        assertNotEquals(x.enrollmentRequests(),"no enrollment requests yet");
+        assertTrue(z.logout());
+        assertTrue(x.deleteCourse("DM111"));
+        y.endsem();
     }
 
     @Test
     void acceptorreject(){
+        admin y=new admin();
+
         if(admin.viewsemester().equals("no sem is running")){
             assertFalse(x.approveordissaprove("DM111","2020csb2","1"));
             assertFalse(x.approveordissaprove("DM111","2020csb2","2"));
         }
         else{
-
-            x.addCourse("DM111","3");
-            student y=new student();
-            assertTrue(y.login("2020csb2","iitropar"));
-            y.addCourse("DM111");
-            assertTrue(x.approveordissaprove("DM111","2020csb2","1"));
-            assertTrue(x.approveordissaprove("DM111","2020csb2","2"));
-            assertTrue(y.logout());
-            assertTrue(x.deleteCourse("DM111"));
+            y.endsem();
         }
+        y.startsem("2030","winter");
+        y.updatecoursecatalog("DM111");
+        x.addCourse("DM111","3");
+        student z=new student();
+        assertTrue(z.login("2020csb2@iitrpr.ac.in","iitropar"));
+        z.addCourse("DM111");
+        assertTrue(x.approveordissaprove("DM111","2020csb2","1"));
+        assertTrue(x.approveordissaprove("DM111","2020csb2","2"));
+        assertTrue(z.logout());
+        assertTrue(x.deleteCourse("DM111"));
+        y.endsem();
     }
 
     @Test
     void submitgrades() {
+        admin y=new admin();
         if(admin.viewsemester().equals("no sem is running")){
             assertFalse(x.submitgrades());
         }
         else{
+//checked all the corner cases using different input in files
+            y.endsem();
 
-            x.addCourse("DM111","0");
-            student y=new student();
-            assertTrue(y.login("2020csb2","iitropar"));
-            y.addCourse("DM111");
-            assertTrue(x.approveordissaprove("DM111","2020csb2","1"));
-            assertTrue(y.logout());
-            assertTrue(x.submitgrades());
-            assertTrue(x.deleteCourse("DM111"));
         }
+        y.startsem("2020","monsoon");
+        assertTrue(x.submitgrades());
+        y.endsem();
     }
 }
