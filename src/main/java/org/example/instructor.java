@@ -222,7 +222,7 @@ return true;
 
                         query="insert into course_offering(course_id,cgpa_limit,instructor_id) values ('"+course_id+"',"+cgpa_limit+",'"+user_id+"');";
                         stmt.executeUpdate(query);
-                        System.out.println("Added course successfully");
+                        System.out.println(" course offered successfully");
                     }
                     else{
 

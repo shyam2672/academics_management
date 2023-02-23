@@ -11,16 +11,16 @@ import java.sql.Statement;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 public class student {
-    static Connection conn = Connect.ConnectDB();
-    static Statement stmt = null;
-    static Scanner input = new Scanner(System.in);
-    public static String user_id="";
+     Connection conn = Connect.ConnectDB();
+     Statement stmt = null;
+     Scanner input = new Scanner(System.in);
+    public  String user_id="";
 
-    public static String token="'logged in'";
+    public  String token="'logged in'";
 
-    public static boolean user=false;
-    public static String batch_id="";
-static int credits=0;
+    public  boolean user=false;
+    public  String batch_id="";
+ int credits=0;
     public boolean login(String email,String password){
 
 
@@ -119,6 +119,7 @@ query="student "+user_id+" logged in on "+ time +"\n";
             System.out.println(e);
             return false;
         }
+        System.out.println("logged out successfully");
         return true;
     }
     public boolean viewprofile()
@@ -167,7 +168,7 @@ query="student "+user_id+" logged in on "+ time +"\n";
             return false;
         }
 
-        return false;
+        return true;
 
     }
     public boolean updateprofile(String name,String password,String phone_number){
@@ -211,16 +212,18 @@ if(f==0){System.out.println("no such course is offered");
 
                     return false;
                 }
+                System.out.println(course_id);
 if(islessthantwo()==false) {
     double cgpa = getcgpa();
+
     if (cgpa > 0 && cgpa < cgpa_limit) {
         System.out.println("you cannot take this course as your cgpa is less than required " + cgpa_limit);
-
         return false;
     }
 }
 
-query="select * from course where course_id='"+course_id+"';";
+
+query="select * from course where id='"+course_id+"';";
               try{
                   ResultSet rs= stmt.executeQuery(query);
                   int c=0;
@@ -428,32 +431,22 @@ if(flag==0){
 
     public double getcgpa()
     {
-         String query="select * from grades where student_id='"+user_id+"';";
+         String query="select grades.grade,course.c from grades,course where student_id='"+user_id+"' and course.id=grades.course_id;";
          double cgpa=0.0;
-        double credits=0;
+        double creds=0;
         double points=0;
         int f=0;
+        String cid="",grade="";
 
         try {
             stmt= conn.createStatement();
             ResultSet rs=stmt.executeQuery(query);
-            ResultSetMetaData rsmd;
-            rsmd=rs.getMetaData();
-            int columnsNumber = rsmd.getColumnCount();
-
             while (rs.next()) {
                 f++;
 
-                String cid=rs.getString(2);
-                String grade=rs.getString(3);
-                String q="select * from course where id='"+cid+"';";
-                ResultSet rs2=stmt.executeQuery(q);
+                 grade=rs.getString(1);
+                 creds+=rs.getInt(2);
 
-                while (rs2.next()){
-//                    System.out.println("fuck");
-
-                    credits+=rs2.getInt(7);
-                }
                 switch (grade){
                     case "A":points+=10;break;
                     case "A-":points+=9;break;
@@ -466,25 +459,24 @@ if(flag==0){
                     case "F":points+=0;break;
 
                 }
-                System.out.println(credits +" " + points);
+                System.out.println(creds +" " + points);
             }
-
-
 
             if(f==0){
                 return 0.0;
             }
             else{
-                cgpa=points/credits;
+                cgpa=points/creds;
             }
         } catch (SQLException e) {
-
-            if(credits!=0.0 && f!=0){
-            cgpa=points/credits;
+System.out.println(e);
+            if(creds!=0.0 && f!=0){
+            cgpa=points/creds;
 //            System.out.println(cgpa);
             return cgpa;}
             return 0.0;
         }
+        System.out.println(cgpa);
         return cgpa;
     }
 
@@ -492,7 +484,7 @@ if(flag==0){
 String query="\n" +
         "select ug_curriculum.course_id\n" +
         "from ug_curriculum\n" +
-        "where course_type='core'\n" +
+        "where course_type='core' and batch_id='"+batch_id+"'\n" +
         "except\n" +
         "select grades.course_id\n" +
         "from grades\n" +
@@ -500,10 +492,15 @@ String query="\n" +
         try {
             stmt= conn.createStatement();
             ResultSet rs=stmt.executeQuery(query);
+
             int f=0;
+            String responsequery="";
             while (rs.next()){
+                responsequery+=rs.getString(1)+"   ";
                 f++;
             }
+            System.out.println(responsequery);
+
             if(f>0){
 return false;
             }
@@ -529,11 +526,10 @@ return false;
             while(rs.next()){
                 f++;
             }
-
         } catch (SQLException e) {
+            System.out.println(e);
 //            throw new RuntimeException(e);
         }
-
         if(f<2)return true;
         else return false;
     }
